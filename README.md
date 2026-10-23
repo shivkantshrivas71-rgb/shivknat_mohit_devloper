@@ -69,6 +69,35 @@ Open your browser and navigate to:
 | `PUT` | `/user/profile` | Update current user profile | Yes (Bearer) |
 | `POST` | `/user/forgot-password` | Request password reset OTP | No |
 | `POST` | `/user/reset-password` | Set new password with OTP | No |
+| `POST` | `/chats/new` | Create new conversation session | No |
+| `GET` | `/chats/{user_id}` | List all conversations for user | No |
+| `GET` | `/chats/{chat_id}/messages` | Get message history for chat | No |
+| `POST` | `/chats/send` | Send message, memory (last 10), OpenAI reply | No |
+| `DELETE` | `/chats/{chat_id}` | Delete chat session & messages | No |
+
+---
+
+## 💬 ChatGPT Chat Backend
+
+### 1. Create a Chat
+- **POST** `/chats/new`
+- Payload: `{"user_id": "user_id_here"}`
+- Returns: `chat_id` and default title `"New Conversation"`
+
+### 2. Send Message with 10-Message Memory & OpenAI Call
+- **POST** `/chats/send`
+- Payload:
+  ```json
+  {
+    "chat_id": "67b9...",
+    "user_id": "user_id_here",
+    "message": "Explain quantum computing in simple terms",
+    "api_key": "sk-...",
+    "model_name": "gpt-3.5-turbo"
+  }
+  ```
+- **Context Memory**: Automatically queries strictly the last 10 messages from MongoDB (`.sort("timestamp", -1).limit(10)`), restores chronological order, formats into OpenAI role schema, and queries OpenAI.
+- **Auto-Title**: Automatically renames `"New Conversation"` to the first 25 characters of the prompt (`...`).
 
 ---
 

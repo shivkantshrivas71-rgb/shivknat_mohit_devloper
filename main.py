@@ -18,6 +18,7 @@ from models import (
     ResetPasswordRequest,
     MessageResponse
 )
+from chat import router as chat_router
 from auth import (
     hash_password,
     verify_password,
@@ -28,9 +29,9 @@ from auth import (
 
 # 1. Initialize FastAPI Application
 app = FastAPI(
-    title="ChatBOT User Authentication API",
-    description="User Registration, Email Verification, Login with JWT, Profile Management (View & Update), and Password Reset.",
-    version="1.1.0"
+    title="ChatBOT User Authentication & Chat API",
+    description="User Registration, Email Verification, Login with JWT, Profile Management, Password Reset, and ChatGPT Chat Backend.",
+    version="1.2.0"
 )
 
 # 2. Configure CORS Middleware
@@ -41,6 +42,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 3. Mount Modular Chat Backend Router
+app.include_router(chat_router)
 
 
 # -------------------------------------------------------------
