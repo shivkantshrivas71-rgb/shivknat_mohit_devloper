@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, EmailStr
 
 # 1. Model for User Registration
@@ -16,9 +17,47 @@ class UserResponse(BaseModel):
     id: str
     name: str
     email: EmailStr
+    is_email_verified: bool = False
 
 # 4. Model for Login Token Response
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str
     user: UserResponse
+
+# 5. Model for User Profile Response
+class UserProfileResponse(BaseModel):
+    id: str
+    name: str
+    email: EmailStr
+    is_email_verified: bool = False
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+
+# 6. Model for Updating User Profile
+class UpdateProfileRequest(BaseModel):
+    name: Optional[str] = None
+
+# 7. Model for Requesting Email Verification OTP
+class RequestEmailVerification(BaseModel):
+    email: EmailStr
+
+# 8. Model for Confirming Email Verification with OTP
+class VerifyEmailRequest(BaseModel):
+    email: EmailStr
+    otp: str
+
+# 9. Model for Forgot Password (Request OTP)
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+# 10. Model for Reset Password with OTP
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    otp: str
+    new_password: str
+
+# 11. Generic Message Response
+class MessageResponse(BaseModel):
+    message: str
+    otp: Optional[str] = None

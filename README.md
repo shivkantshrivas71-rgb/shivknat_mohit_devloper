@@ -1,62 +1,80 @@
-# ChatBOT User API (FastAPI + MongoDB)
+# ChatBOT User Authentication API (FastAPI + MongoDB)
 
-Simple, clean and beginner-friendly user authentication system.
+Complete and secure asynchronous user authentication and management system built with FastAPI, Motor (Async MongoDB), and JWT.
 
 ---
 
-## 📁 Project Files
+## ✨ Features
+
+1. **User Registration**: Register with name, email, and password (hashed using `bcrypt`).
+2. **Email Verification**:
+   - `POST /user/verify-email/request` : Request or resend 6-digit verification OTP.
+   - `POST /user/verify-email` : Verify OTP to mark account as email-verified.
+3. **User Authentication (Login)**: Authenticates credentials and returns a secure JWT Bearer token stored in MongoDB.
+4. **User Profile Management**:
+   - `GET /user/profile` : View authenticated user's profile details.
+   - `PUT /user/profile` : Update user profile (e.g., full name).
+5. **Password Reset Flow**:
+   - `POST /user/forgot-password` : Generate 6-digit OTP valid for 10 minutes.
+   - `POST /user/reset-password` : Verify OTP, update password, and invalidate existing sessions.
+
+---
+
+## 📁 Project Structure
 
 ```text
 chatBOT1_new/
-├── main.py          # FastAPI App & Endpoints (/user/register, /user/login)
-├── auth.py          # Password Hash & Token Generator Helpers
-├── database.py      # MongoDB Connection
-├── models.py        # Pydantic Schemas (UserRegister, UserLogin)
-├── .env             # MongoDB URL & Secret Key
-├── requirements.txt # Project Dependencies
-└── venv/            # Virtual Environment
+├── main.py          # FastAPI application, route handlers, and configuration
+├── auth.py          # Password hashing, JWT token management, and auth dependencies
+├── database.py      # Asynchronous MongoDB connection using Motor
+├── models.py        # Pydantic data schemas for requests and responses
+├── .env             # Environment configuration (MongoDB URL, Secret Keys)
+├── requirements.txt # Project dependencies
+└── README.md        # Project documentation
 ```
 
 ---
 
-## 🚀 How to Run
+## 🚀 Getting Started
 
-1. **Activate Virtual Environment**:
-   ```powershell
-   .\venv\Scripts\Activate.ps1
-   ```
+### 1. Start the Server
 
-2. **Run Server**:
-   ```bash
-   python main.py
-   ```
+From the `chatBOT1_new` folder:
+```bash
+uvicorn main:app --reload
+```
 
-3. **Open Interactive Docs**:
-   - [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+Or from the workspace root:
+```bash
+uvicorn main:app --reload --app-dir chatBOT1_new
+```
 
----
+### 2. Interactive API Documentation
 
-## 📡 User APIs
-
-### 1. User Register
-- **Endpoint**: `POST http://127.0.0.1:8000/user/register`
-- **Request Body**:
-  ```json
-  {
-    "name": "Alex",
-    "email": "alex@example.com",
-    "password": "Password123"
-  }
-  ```
+Open your browser and navigate to:
+👉 **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)** (Swagger UI)
 
 ---
 
-### 2. User Login
-- **Endpoint**: `POST http://127.0.0.1:8000/user/login`
-- **Request Body**:
-  ```json
-  {
-    "email": "alex@example.com",
-    "password": "Password123"
-  }
-  ```
+## 📡 API Endpoints Overview
+
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `GET` | `/` | API status and health check | No |
+| `POST` | `/user/register` | Register new user | No |
+| `POST` | `/user/verify-email/request` | Request verification OTP | No |
+| `POST` | `/user/verify-email` | Confirm verification OTP | No |
+| `POST` | `/user/login` | Authenticate user & receive JWT | No |
+| `GET` | `/user/profile` | View current user profile | Yes (Bearer) |
+| `PUT` | `/user/profile` | Update current user profile | Yes (Bearer) |
+| `POST` | `/user/forgot-password` | Request password reset OTP | No |
+| `POST` | `/user/reset-password` | Set new password with OTP | No |
+
+---
+
+## 🔒 Authentication in Swagger UI
+
+To test protected routes (`/user/profile`):
+1. Call `POST /user/login` to get your `access_token`.
+2. Click the green **Authorize** button at the top of the Swagger UI (`/docs`).
+3. Paste the token into the **Value** field and click **Authorize**.
