@@ -1,23 +1,19 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+"""
+=============================================================================
+Project: chatBOT_new
+Description: FastAPI Authentication System with MongoDB backend
+Endpoints:
+  - POST /api/v1/auth/register : Register user with valid name, email & password
+  - POST /api/v1/auth/login    : Authenticate user & return JWT Token
+  - GET  /                     : Service status & information
+  - GET  /health               : Health check (FastAPI + MongoDB)
+  - GET  /docs                 : Interactive Swagger UI documentation
+=============================================================================
+"""
 
-app = FastAPI()
+import uvicorn
+from app.main import app
 
-
-class ChatMessage(BaseModel):
-    message: str
-
-
-@app.get("/")
-def home():
-    return {"message": "Chatbot API is running"}
-
-
-@app.post("/chat")
-def chat(data: ChatMessage):
-    user_message = data.message
-
-    return {
-        "user_message": user_message,
-        "reply": f"You said: {user_message}"
-    }
+if __name__ == "__main__":
+    # Start the server locally on port 8000 with auto-reload enabled
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
