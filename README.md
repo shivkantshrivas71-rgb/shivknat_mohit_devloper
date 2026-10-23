@@ -24,11 +24,19 @@ Complete and secure asynchronous user authentication and management system built
 
 ```text
 chatBOT1_new/
+├── app.py           # Streamlit Web UI Frontend application
 ├── main.py          # FastAPI application, route handlers, and configuration
 ├── auth.py          # Password hashing, JWT token management, and auth dependencies
 ├── database.py      # Asynchronous MongoDB connection using Motor
-├── models.py        # Pydantic data schemas for requests and responses
-├── .env             # Environment configuration (MongoDB URL, Secret Keys)
+├── models.py        # Pydantic data schemas for authentication requests & responses
+├── router/          # Modular routing directory
+│   ├── __init__.py
+│   ├── chat_router.py  # Chat session and messaging endpoints
+│   └── schemas.py      # Chat Pydantic request/response schemas
+├── services/        # External service integrations
+│   ├── __init__.py
+│   └── llm_service.py  # OpenRouter LLM service caller
+├── .env             # Environment configuration (MongoDB, Secret Key, OpenRouter Key)
 ├── requirements.txt # Project dependencies
 └── README.md        # Project documentation
 ```
@@ -37,21 +45,33 @@ chatBOT1_new/
 
 ## 🚀 Getting Started
 
-### 1. Start the Server
+### 1. Configure `.env`
+Ensure your [chatBOT1_new/.env](file:///d:/chotebotproject0001/chatBOT1_new/.env) contains:
+```env
+MONGODB_URL=mongodb+srv://...
+DATABASE_NAME=chatbot_db
+SECRET_KEY=your_jwt_secret
+OPENROUTER_API_KEY=sk-or-v1-...
+```
+
+### 2. Start the FastAPI Backend
 
 From the `chatBOT1_new` folder:
 ```bash
 uvicorn main:app --reload
 ```
 
-Or from the workspace root:
+### 3. Start the Streamlit Frontend
+
+In a separate terminal window:
 ```bash
-uvicorn main:app --reload --app-dir chatBOT1_new
+streamlit run app.py
 ```
+This opens the ChatGPT frontend interface in your browser at:
+👉 **`http://localhost:8501`**
 
-### 2. Interactive API Documentation
+### 4. Interactive API Documentation
 
-Open your browser and navigate to:
 👉 **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)** (Swagger UI)
 
 ---
@@ -69,6 +89,34 @@ Open your browser and navigate to:
 | `PUT` | `/user/profile` | Update current user profile | Yes (Bearer) |
 | `POST` | `/user/forgot-password` | Request password reset OTP | No |
 | `POST` | `/user/reset-password` | Set new password with OTP | No |
+| `POST` | `/chats/new` | Create new conversation session | No |
+| `GET` | `/chats/{user_id}` | List all conversations for user | No |
+| `GET` | `/chats/{chat_id}/messages` | Get message history for chat | No |
+| `POST` | `/chats/send` | Send message, memory (last 10), OpenRouter AI reply | No |
+| `DELETE` | `/chats/{chat_id}` | Delete chat session & messages | No |
+
+---
+
+## 💬 ChatGPT Chat Backend (OpenRouter)
+
+### 1. Create a Chat
+- **POST** `/chats/new`
+- Payload: `{"user_id": "user_id_here"}`
+- Returns: `chat_id` and default title `"New Conversation"`
+
+### 2. Send Message with 10-Message Memory & OpenRouter Call
+- **POST** `/chats/send`
+- Payload:
+  ```json
+  {
+    "chat_id": "6adb...",
+    "user_id": "user_id_here",
+    "message": "Explain quantum computing in simple terms",
+    "model_name": "openai/gpt-3.5-turbo"
+  }
+  ```
+- **Context Memory**: Automatically queries strictly the last 10 messages from MongoDB (`.sort("timestamp", -1).limit(10)`), restores chronological order, formats into standard OpenAI role schema, and sends request to OpenRouter.
+- **Auto-Title**: Automatically updates `"New Conversation"` with the first 25 characters of the user prompt (`...`).
 
 ---
 
