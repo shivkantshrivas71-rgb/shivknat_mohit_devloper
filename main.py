@@ -18,7 +18,7 @@ from models import (
     ResetPasswordRequest,
     MessageResponse
 )
-from chat import router as chat_router
+from router.chat_router import router as chat_router
 from auth import (
     hash_password,
     verify_password,
