@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
+import base64
 import uvicorn
-from fastapi import FastAPI, HTTPException, status, Depends
+from fastapi import FastAPI, HTTPException, status, Depends, UploadFile, File, Response
 from fastapi.middleware.cors import CORSMiddleware
 from bson import ObjectId
 
@@ -12,6 +13,9 @@ from models import (
     TokenResponse,
     UserProfileResponse,
     UpdateProfileRequest,
+    UserSettingsResponse,
+    UpdateSettingsRequest,
+    UploadPhotoResponse,
     RequestEmailVerification,
     VerifyEmailRequest,
     ForgotPasswordRequest,
@@ -285,10 +289,16 @@ async def get_user_profile(current_user: dict = Depends(get_current_user)):
     updated_at_val = current_user.get("updated_at")
     updated_at_str = updated_at_val.isoformat() if updated_at_val else None
 
+    user_id_str = str(current_user["_id"])
+    avatar_url = current_user.get("avatar_url") or (f"/user/profile/photo/{user_id_str}" if current_user.get("avatar_base64") else None)
+
     return UserProfileResponse(
-        id=str(current_user["_id"]),
+        id=user_id_str,
         name=current_user["name"],
         email=current_user["email"],
+        surname=current_user.get("surname", ""),
+        gender=current_user.get("gender", "Male"),
+        avatar_url=avatar_url,
         is_email_verified=current_user.get("is_email_verified", False),
         created_at=created_at_str,
         updated_at=updated_at_str
@@ -296,7 +306,7 @@ async def get_user_profile(current_user: dict = Depends(get_current_user)):
 
 
 # -------------------------------------------------------------
-# 9. User Profile - Update
+# 9. User Profile - Update (Name, Surname, Gender)
 # -------------------------------------------------------------
 @app.put(
     "/user/profile",
@@ -307,7 +317,7 @@ async def update_user_profile(
     payload: UpdateProfileRequest,
     current_user: dict = Depends(get_current_user)
 ):
-    """Update profile information (e.g. name) for the authenticated user."""
+    """Update profile information (e.g. name, surname, gender) for the authenticated user."""
     users = get_user_collection()
     updates = {}
 
@@ -319,6 +329,16 @@ async def update_user_profile(
                 detail="Name cannot be empty"
             )
         updates["name"] = clean_name
+
+    if payload.surname is not None:
+        updates["surname"] = payload.surname.strip()
+
+    if payload.gender is not None:
+        updates["gender"] = payload.gender.strip()
+
+    if payload.avatar_base64 is not None:
+        updates["avatar_base64"] = payload.avatar_base64
+        updates["avatar_url"] = f"/user/profile/photo/{str(current_user['_id'])}"
 
     if not updates:
         raise HTTPException(
@@ -343,13 +363,157 @@ async def update_user_profile(
     updated_at_val = updated_user.get("updated_at")
     updated_at_str = updated_at_val.isoformat() if updated_at_val else None
 
+    user_id_str = str(updated_user["_id"])
+    avatar_url = updated_user.get("avatar_url") or (f"/user/profile/photo/{user_id_str}" if updated_user.get("avatar_base64") else None)
+
     return UserProfileResponse(
-        id=str(updated_user["_id"]),
+        id=user_id_str,
         name=updated_user["name"],
         email=updated_user["email"],
+        surname=updated_user.get("surname", ""),
+        gender=updated_user.get("gender", "Male"),
+        avatar_url=avatar_url,
         is_email_verified=updated_user.get("is_email_verified", False),
         created_at=created_at_str,
         updated_at=updated_at_str
+    )
+
+
+# -------------------------------------------------------------
+# 9b. User Profile - Photo Upload API
+# -------------------------------------------------------------
+@app.post(
+    "/user/profile/photo",
+    response_model=UploadPhotoResponse,
+    tags=["Profile"]
+)
+async def upload_user_photo(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Upload and persist user profile avatar photo into MongoDB cloud.
+    """
+    allowed_types = ["image/png", "image/jpeg", "image/jpg", "image/webp"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Unsupported image format. Allowed: PNG, JPEG, WEBP."
+        )
+
+    photo_bytes = await file.read()
+    if len(photo_bytes) > 5 * 1024 * 1024:  # 5MB limit
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Profile photo exceeds 5MB size limit."
+        )
+
+    base64_str = base64.b64encode(photo_bytes).decode("utf-8")
+    user_id_str = str(current_user["_id"])
+    avatar_url = f"/user/profile/photo/{user_id_str}"
+
+    users = get_user_collection()
+    await users.update_one(
+        {"_id": current_user["_id"]},
+        {
+            "$set": {
+                "avatar_base64": base64_str,
+                "avatar_content_type": file.content_type,
+                "avatar_url": avatar_url,
+                "updated_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+
+    return UploadPhotoResponse(
+        message="Profile photo updated successfully in MongoDB Atlas",
+        avatar_url=avatar_url
+    )
+
+
+# -------------------------------------------------------------
+# 9c. User Profile - Photo Fetch API (Public Binary Image)
+# -------------------------------------------------------------
+@app.get(
+    "/user/profile/photo/{user_id}",
+    tags=["Profile"],
+    summary="Get user profile picture binary stream"
+)
+async def get_user_photo(user_id: str):
+    """
+    Returns the binary image data of a user's uploaded avatar.
+    """
+    users = get_user_collection()
+    clean_id = user_id.strip()
+    u_filter = {"_id": ObjectId(clean_id)} if ObjectId.is_valid(clean_id) else {"_id": clean_id}
+
+    user = await users.find_one(u_filter)
+    if not user or not user.get("avatar_base64"):
+        raise HTTPException(status_code=404, detail="Profile picture not found.")
+
+    raw_bytes = base64.b64decode(user["avatar_base64"])
+    c_type = user.get("avatar_content_type", "image/png")
+    return Response(content=raw_bytes, media_type=c_type)
+
+
+# -------------------------------------------------------------
+# 9d. User Settings API (Preferences for Three-Dot Menu)
+# -------------------------------------------------------------
+@app.get(
+    "/user/settings",
+    response_model=UserSettingsResponse,
+    tags=["Settings"],
+    summary="Retrieve user configuration settings"
+)
+async def get_user_settings(current_user: dict = Depends(get_current_user)):
+    """Fetch user preferences (theme, model, speech speed)."""
+    settings = current_user.get("settings", {})
+    return UserSettingsResponse(
+        selected_model=settings.get("selected_model", "openai/gpt-4o-mini"),
+        theme=settings.get("theme", "light"),
+        voice_speed=settings.get("voice_speed", 1.0),
+        system_prompt=settings.get("system_prompt", None)
+    )
+
+
+@app.put(
+    "/user/settings",
+    response_model=UserSettingsResponse,
+    tags=["Settings"],
+    summary="Update user configuration settings"
+)
+async def update_user_settings(
+    payload: UpdateSettingsRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Save user preferences in MongoDB Atlas."""
+    users = get_user_collection()
+    existing_settings = current_user.get("settings", {})
+
+    if payload.selected_model is not None:
+        existing_settings["selected_model"] = payload.selected_model
+    if payload.theme is not None:
+        existing_settings["theme"] = payload.theme
+    if payload.voice_speed is not None:
+        existing_settings["voice_speed"] = payload.voice_speed
+    if payload.system_prompt is not None:
+        existing_settings["system_prompt"] = payload.system_prompt
+
+    await users.update_one(
+        {"_id": current_user["_id"]},
+        {
+            "$set": {
+                "settings": existing_settings,
+                "updated_at": datetime.now(timezone.utc)
+            }
+        }
+    )
+
+    return UserSettingsResponse(
+        selected_model=existing_settings.get("selected_model", "openai/gpt-4o-mini"),
+        theme=existing_settings.get("theme", "light"),
+        voice_speed=existing_settings.get("voice_speed", 1.0),
+        system_prompt=existing_settings.get("system_prompt", None)
     )
 
 

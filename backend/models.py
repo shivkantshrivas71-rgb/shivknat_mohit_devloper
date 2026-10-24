@@ -30,6 +30,9 @@ class UserProfileResponse(BaseModel):
     id: str
     name: str
     email: EmailStr
+    surname: Optional[str] = ""
+    gender: Optional[str] = "Male"
+    avatar_url: Optional[str] = None
     is_email_verified: bool = False
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
@@ -37,6 +40,26 @@ class UserProfileResponse(BaseModel):
 # 6. Model for Updating User Profile
 class UpdateProfileRequest(BaseModel):
     name: Optional[str] = None
+    surname: Optional[str] = None
+    gender: Optional[str] = None
+    avatar_base64: Optional[str] = None
+
+# 6b. Model for User Settings (Preferences in Three-Dot Menu)
+class UserSettingsResponse(BaseModel):
+    selected_model: str = "openai/gpt-4o-mini"
+    theme: str = "light"
+    voice_speed: float = 1.0
+    system_prompt: Optional[str] = None
+
+class UpdateSettingsRequest(BaseModel):
+    selected_model: Optional[str] = None
+    theme: Optional[str] = None
+    voice_speed: Optional[float] = None
+    system_prompt: Optional[str] = None
+
+class UploadPhotoResponse(BaseModel):
+    message: str
+    avatar_url: str
 
 # 7. Model for Requesting Email Verification OTP
 class RequestEmailVerification(BaseModel):

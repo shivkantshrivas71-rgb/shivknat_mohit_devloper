@@ -45,3 +45,44 @@ class SendMessageResponse(BaseModel):
 class DeleteChatResponse(BaseModel):
     message: str
     chat_id: str
+
+
+# -------------------------------------------------------------
+# Share Chat Schemas
+# -------------------------------------------------------------
+class ShareChatResponse(BaseModel):
+    share_id: str
+    chat_id: str
+    share_url: str
+    title: str
+    created_at: str
+
+
+class SharedChatMessageItem(BaseModel):
+    role: str
+    content: str
+    timestamp: Optional[str] = None
+
+
+class SharedChatViewResponse(BaseModel):
+    share_id: str
+    chat_id: str
+    title: str
+    created_at: str
+    messages: list[SharedChatMessageItem]
+
+
+# -------------------------------------------------------------
+# Voice / Mic Schemas
+# -------------------------------------------------------------
+class VoiceTranscribeResponse(BaseModel):
+    success: bool
+    transcribed_text: str
+    message: Optional[str] = None
+
+
+class VoiceChatResponse(BaseModel):
+    chat_id: str
+    transcribed_prompt: str
+    reply: str
+    role: str = "assistant"
