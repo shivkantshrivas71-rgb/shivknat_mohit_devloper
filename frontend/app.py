@@ -9,6 +9,7 @@ from typing import List, Dict, Optional
 
 # Import dynamic API Base URL from frontend/config.py
 from config import API_BASE_URL
+BACKEND_BASE_URL = API_BASE_URL
 
 # -------------------------------------------------------------
 # 1. Page Configuration & Futuristic Cyber Dark Theme
@@ -1557,10 +1558,8 @@ if not st.session_state.messages:
     col_img_l, col_img_c, col_img_r = st.columns([1.1, 1.4, 1.1])
     with col_img_c:
         local_purple = os.path.join(os.path.dirname(__file__), "assets", "purple_chart.png")
-        if os.path.exists(local_purple):
-            st.image(local_purple, use_container_width=True)
-        else:
-            st.image(f"{BACKEND_BASE_URL}{banner_info.get('image_url', '/static/purple_chart.png')}", use_container_width=True)
+        img_src = local_purple if os.path.exists(local_purple) else f"{API_BASE_URL}{banner_info.get('image_url', '/static/purple_chart.png')}"
+        st.image(img_src, width=320)
 
         b_title = banner_info.get("title", "GPT-6 with Intelligent UI")
         b_sub = banner_info.get("subtitle", "Get visual and interactive answers to help you take the next step")
@@ -1594,7 +1593,7 @@ else:
                 f_info = msg["file_info"]
                 ftype = f_info.get("file_type", "")
                 fname = f_info.get("filename", "File")
-                furl = f"{BACKEND_BASE_URL}{f_info.get('file_url', '')}"
+                furl = f"{API_BASE_URL}{f_info.get('file_url', '')}"
                 
                 if ftype == "image":
                     st.image(furl, caption=f"📷 {fname}", width=320)
@@ -1724,7 +1723,7 @@ if prompt_to_send:
                 f_info = user_msg["file_info"]
                 ftype = f_info.get("file_type", "")
                 fname = f_info.get("filename", "File")
-                furl = f"{BACKEND_BASE_URL}{f_info.get('file_url', '')}"
+                furl = f"{API_BASE_URL}{f_info.get('file_url', '')}"
                 if ftype == "image":
                     st.image(furl, caption=f"📷 {fname}", width=320)
                 elif ftype == "video":
