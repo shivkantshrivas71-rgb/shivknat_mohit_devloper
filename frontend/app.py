@@ -490,6 +490,47 @@ def api_reset_password(email: str, otp: str, new_password: str) -> dict:
         return {"success": False, "error": str(e)}
 
 
+def api_get_user_profile(auth_token: str) -> dict:
+    """Fetch user profile from backend /user/profile endpoint."""
+    if not auth_token:
+        return {"success": False, "error": "No token provided"}
+    try:
+        resp = requests.get(
+            f"{API_BASE_URL}/user/profile",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            timeout=5.0
+        )
+        if resp.status_code == 200:
+            return {"success": True, "data": resp.json()}
+        else:
+            return {"success": False, "error": f"Status {resp.status_code}"}
+    except requests.RequestException as e:
+        return {"success": False, "error": str(e)}
+
+
+def api_update_user_profile(name: str, auth_token: str) -> dict:
+    """Update profile directly on backend /user/profile endpoint (persisted in MongoDB Atlas)."""
+    if not auth_token:
+        return {"success": False, "error": "No token provided"}
+    try:
+        resp = requests.put(
+            f"{API_BASE_URL}/user/profile",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            json={"name": name.strip()},
+            timeout=6.0
+        )
+        if resp.status_code == 200:
+            return {"success": True, "data": resp.json()}
+        else:
+            try:
+                detail = resp.json().get("detail", "Update failed")
+            except Exception:
+                detail = resp.text or f"Status {resp.status_code}"
+            return {"success": False, "error": detail}
+    except requests.RequestException as e:
+        return {"success": False, "error": f"Server connection failed: {str(e)}"}
+
+
 # -------------------------------------------------------------
 # 5. Chat & Messaging API Functions
 # -------------------------------------------------------------
@@ -1072,17 +1113,34 @@ with top_col3:
                             with open(USER_AVATAR_FILE, "wb") as pf:
                                 pf.write(photo_data)
 
-                        st.session_state.user_first_name = edit_first_name.strip() or "User"
-                        st.session_state.user_surname = edit_surname.strip()
+                        new_first = edit_first_name.strip() or "User"
+                        new_surname = edit_surname.strip()
+                        full_name = f"{new_first} {new_surname}".strip()
+
+                        st.session_state.user_first_name = new_first
+                        st.session_state.user_surname = new_surname
+                        st.session_state.user_full_name = full_name
                         st.session_state.user_gender = edit_gender
 
+                        # 1. Real-time Backend Cloud API Call (PUT /user/profile -> MongoDB)
+                        cloud_synced = False
+                        if st.session_state.get("auth_token"):
+                            with st.spinner("Updating MongoDB via Backend API..."):
+                                api_res = api_update_user_profile(full_name, st.session_state.auth_token)
+                                if api_res.get("success"):
+                                    cloud_synced = True
+
+                        # 2. Local device storage backup
                         save_stored_profile({
                             "first_name": st.session_state.user_first_name,
                             "surname": st.session_state.user_surname,
                             "gender": st.session_state.user_gender
                         })
 
-                        st.toast("Profile updated successfully! ✅", icon="💾")
+                        if cloud_synced:
+                            st.toast("Profile updated & Synced to Cloud DB! ✅", icon="💾")
+                        else:
+                            st.toast("Profile saved successfully! ✅", icon="💾")
                         st.rerun()
 
                 with col_clear:
