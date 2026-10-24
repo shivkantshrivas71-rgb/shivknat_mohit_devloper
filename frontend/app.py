@@ -689,6 +689,23 @@ def api_upload_chat_attachment(file_bytes: bytes, filename: str, chat_id: str, u
         return {"success": False, "error": str(e)}
 
 
+def api_get_current_banner() -> dict:
+    """Fetch rotating showcase banner from backend /banner/current (changes every 2s)."""
+    try:
+        resp = requests.get(f"{API_BASE_URL}/banner/current", timeout=2.0)
+        if resp.status_code == 200:
+            return resp.json()
+    except Exception:
+        pass
+    return {
+        "title": "GPT-6 with Intelligent UI",
+        "subtitle": "Get visual and interactive answers to help you take the next step",
+        "image_url": "/static/purple_chart.png",
+        "action_text": "Try GPT-6",
+        "prompt": "Explain GPT-6 with Intelligent UI and provide interactive visual insights."
+    }
+
+
 # -------------------------------------------------------------
 # 5. Chat & Messaging API Functions
 # -------------------------------------------------------------
@@ -1134,16 +1151,144 @@ if not st.session_state.is_authenticated:
 # 8. AUTHENTICATED USER INTERFACE & SIDEBAR
 # -------------------------------------------------------------
 with st.sidebar:
-    # 1. ChatGPT + New Chat Button at top of Sidebar
-    if st.button("＋  New chat", key="sidebar_new_chat_top", use_container_width=True, disabled=not backend_online):
+    # 1. ChatGPT Logo & Name close together at topmost left
+    st.markdown("""
+        <div style="display: flex; align-items: center; gap: 10px; padding: 2px 4px 8px 4px;">
+            <div style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: #ffffff; border: 1.5px solid #e5e5e5; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="#10a37f" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1683a.071.071 0 0 1 .038.052v5.5826a4.5045 4.5045 0 0 1-4.4945 4.4947zm-9.66-4.1354a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1401-1.6564zm-1.003-9.5218a4.466 4.466 0 0 1 2.3418-1.9729v.1656l-.0048 5.5163a.776.776 0 0 0 .3927.6766l5.8428 3.3732-2.02 1.1683a.0804.0804 0 0 1-.071 0l-4.8303-2.7913a4.4944 4.4944 0 0 1-1.6512-6.1358zm16.597 3.8558-5.8428-3.3732 2.02-1.1683a.0804.0804 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6773a.79.79 0 0 0-.402-.6767zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.776.776 0 0 0-.7854 0L9.409 10.1297V7.7973a.0804.0804 0 0 1 .0332-.0615l4.8303-2.7914a4.4992 4.4992 0 0 1 6.6802 4.6545v.0001zm-12.641 4.1353-2.02-1.1635a.0804.0804 0 0 1-.038-.052v-5.5826a4.4992 4.4992 0 0 1 7.3709-3.4539l-.142.0805-4.7783 2.7582a.7948.7948 0 0 0-.3926.6813v6.732z"/>
+                </svg>
+            </div>
+            <span style="font-size: 1.22rem; font-weight: 700; color: #0d0d0d; letter-spacing: -0.4px;">ChatGPT</span>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # 2. Settings & Profile Popover at Top of Left Sidebar
+    with st.popover("⚙️  Settings & Profile", help="User Profile, Photo, Model, and Account", use_container_width=True):
+        st.markdown("""
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                <span style="font-weight: 700; font-size: 1.05rem; color: #0d0d0d;">Settings & Account</span>
+            </div>
+        """, unsafe_allow_html=True)
+
+        tab_profile, tab_system = st.tabs(["👤 User Profile", "⚡ Preferences"])
+
+        with tab_profile:
+            st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+            if avatar_base64_src:
+                big_pic = f'<img src="{avatar_base64_src}" style="width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2.5px solid #10a37f; box-shadow: 0 2px 12px rgba(16,163,127,0.25); display: block; margin: 0 auto;">'
+            else:
+                big_pic = '<div style="width: 75px; height: 75px; border-radius: 50%; background: #f3f4f6; border: 2px dashed #9ca3af; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; margin: 0 auto;">👤</div>'
+
+            st.markdown(f"""
+                <div style="text-align: center; margin-bottom: 10px;">
+                    {big_pic}
+                    <div style="font-size: 0.76rem; color: #6b7280; margin-top: 6px;">Profile Photo Preview</div>
+                </div>
+            """, unsafe_allow_html=True)
+
+            uploaded_photo = st.file_uploader(
+                "Update Profile Photo (PNG, JPG, WEBP):",
+                type=["png", "jpg", "jpeg", "webp"],
+                key="top_popover_photo_uploader"
+            )
+
+            edit_first_name = st.text_input("First Name (नाम):", value=st.session_state.user_first_name, key="top_input_first_name")
+            edit_surname = st.text_input("Surname / Last Name (उपनाम):", value=st.session_state.user_surname, key="top_input_surname")
+            
+            gender_choices = ["Male", "Female", "Other", "Prefer not to say"]
+            curr_gender_idx = gender_choices.index(st.session_state.user_gender) if st.session_state.user_gender in gender_choices else 0
+            edit_gender = st.selectbox("Gender (लिंग):", options=gender_choices, index=curr_gender_idx, key="top_input_gender")
+
+            col_save, col_clear = st.columns([0.65, 0.35])
+            with col_save:
+                if st.button("💾 Save Profile", key="btn_top_save_profile", type="primary", use_container_width=True):
+                    new_first = edit_first_name.strip() or "User"
+                    new_surname = edit_surname.strip()
+                    new_gender = edit_gender
+
+                    st.session_state.user_first_name = new_first
+                    st.session_state.user_surname = new_surname
+                    st.session_state.user_full_name = f"{new_first} {new_surname}".strip()
+                    st.session_state.user_gender = new_gender
+
+                    if uploaded_photo is not None:
+                        photo_data = uploaded_photo.read()
+                        with open(USER_AVATAR_FILE, "wb") as pf:
+                            pf.write(photo_data)
+                        if st.session_state.get("auth_token"):
+                            api_upload_profile_photo(photo_data, uploaded_photo.name, st.session_state.auth_token)
+
+                    if st.session_state.get("auth_token"):
+                        api_update_user_profile_full(new_first, new_surname, new_gender, st.session_state.auth_token)
+                        api_update_user_settings(st.session_state.selected_model, "light", st.session_state.auth_token)
+
+                    save_stored_profile({
+                        "first_name": st.session_state.user_first_name,
+                        "surname": st.session_state.user_surname,
+                        "gender": st.session_state.user_gender
+                    })
+
+                    st.toast("Profile, Photo & Cloud DB Updated! ✅", icon="💾")
+                    st.rerun()
+
+            with col_clear:
+                if has_custom_avatar:
+                    if st.button("Remove Photo", key="btn_top_remove_photo", use_container_width=True):
+                        if os.path.exists(USER_AVATAR_FILE):
+                            os.remove(USER_AVATAR_FILE)
+                        st.toast("Profile photo removed", icon="🗑️")
+                        st.rerun()
+
+        with tab_system:
+            st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
+            st.markdown("<span style='font-size: 0.82rem; font-weight: 600; color: #4b5563;'>ACTIVE NEURAL MODEL</span>", unsafe_allow_html=True)
+            menu_model = st.selectbox(
+                "Select Model:",
+                options=AVAILABLE_MODELS,
+                index=AVAILABLE_MODELS.index(st.session_state.selected_model) if st.session_state.selected_model in AVAILABLE_MODELS else 1,
+                key="top_menu_model_select"
+            )
+            if menu_model != st.session_state.selected_model:
+                st.session_state.selected_model = menu_model
+                if st.session_state.get("auth_token"):
+                    api_update_user_settings(menu_model, "light", st.session_state.auth_token)
+                st.rerun()
+
+            st.markdown("---")
+            st.markdown(f"""
+                <div style="font-size: 0.78rem; color: #6b7280; font-family: monospace; line-height: 1.6;">
+                    • Server: <span style="color: #0284c7;">{API_BASE_URL}</span><br>
+                    • Status: <span style="color: {'#10b981' if backend_online else '#ef4444'};">{'CONNECTED' if backend_online else 'DISCONNECTED'}</span><br>
+                    • User ID: <span style="color: #0d9488;">{st.session_state.user_id}</span><br>
+                    • Email: <span style="color: #4b5563;">{st.session_state.user_email}</span>
+                </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("---")
+        if st.button("🚪 Log out", key="top_popover_logout_btn", help="Sign out of account", use_container_width=True):
+            st.session_state.is_authenticated = False
+            st.session_state.auth_token = None
+            st.session_state.user_id = ""
+            st.session_state.user_email = ""
+            st.session_state.user_full_name = ""
+            st.session_state.current_chat_id = None
+            st.session_state.chats = None
+            st.session_state.messages = []
+            st.rerun()
+
+    # 3. Hello User / New Chat Button (Replacing + New chat)
+    st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
+    user_greet_name = st.session_state.get("user_first_name") or "User"
+    if st.button(f"👋  Hello {user_greet_name}! How are you?", key="sidebar_new_chat_top", help="Start fresh new conversation", use_container_width=True, disabled=not backend_online):
         st.session_state.current_chat_id = None
         st.session_state.current_chat_title = "New Conversation"
         st.session_state.messages = []
         st.rerun()
 
-    st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
 
-    # Model Selector
+    # 4. Model Selector
     selected_model = st.selectbox(
         "Model:",
         options=AVAILABLE_MODELS,
@@ -1154,12 +1299,12 @@ with st.sidebar:
 
     st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
 
-    # 📜 Chat History
-    col_hist_title, col_refresh = st.columns([0.80, 0.20])
+    # 5. 📜 Chat History (First 10 words + simple delete button 🗑️)
+    col_hist_title, col_refresh = st.columns([0.78, 0.22])
     with col_hist_title:
-        st.markdown("<span style='font-size: 0.78rem; font-weight: 600; color: #8e8ea0; letter-spacing: 0.5px;'>RECENT CHATS</span>", unsafe_allow_html=True)
+        st.markdown("<span style='font-size: 0.82rem; font-weight: 700; color: #374151; letter-spacing: 0.4px;'>Chat History</span>", unsafe_allow_html=True)
     with col_refresh:
-        if st.button("🔄", key="refresh_chats_btn", help="Refresh"):
+        if st.button("🔄", key="refresh_chats_btn", help="Refresh Chat History"):
             st.session_state.chats = None
             st.rerun()
 
@@ -1168,48 +1313,38 @@ with st.sidebar:
         
         if not chat_sessions:
             st.markdown("""
-                <div style="padding: 16px 10px; text-align: center; color: #64748b; font-size: 0.82rem;">
-                    <em>No archived sessions found.</em><br>
-                    Click <strong>+ New Chat</strong> to begin.
+                <div style="padding: 14px 10px; text-align: center; color: #64748b; font-size: 0.82rem;">
+                    <em>No chat history yet.</em>
                 </div>
             """, unsafe_allow_html=True)
         else:
             for chat in chat_sessions:
                 cid = chat["chat_id"]
                 ctitle = chat.get("title", "New Conversation")
-                created_at_raw = chat.get("created_at")
-                formatted_time = format_chat_timestamp(created_at_raw)
                 is_active = (cid == st.session_state.current_chat_id)
-                short_id = cid[-6:] if len(cid) >= 6 else cid
 
-                # Render Old Chat in Text Format
-                active_class = "history-card-active" if is_active else ""
-                st.markdown(f"""
-                    <div class="history-card {active_class}">
-                        <div class="history-title">{"⚡ " if is_active else "💬 "}{ctitle}</div>
-                        <div class="history-meta">
-                            <span>🕒 {formatted_time}</span>
-                            <span>#{short_id}</span>
-                        </div>
-                    </div>
-                """, unsafe_allow_html=True)
+                # Show first 10 words of the chat history
+                words = ctitle.split()
+                first_10_words = " ".join(words[:10]) + ("..." if len(words) > 10 else "")
 
                 col_open, col_del = st.columns([0.80, 0.20])
                 with col_open:
-                    btn_text = "✓ Active" if is_active else "Open Chat"
-                    if st.button(btn_text, key=f"open_chat_{cid}", use_container_width=True, disabled=is_active):
+                    active_icon = "● " if is_active else "💬 "
+                    btn_text = f"{active_icon}{first_10_words}"
+                    if st.button(btn_text, key=f"open_chat_{cid}", help=ctitle, use_container_width=True, disabled=is_active):
                         st.session_state.current_chat_id = cid
                         st.session_state.current_chat_title = ctitle
                         st.session_state.messages = fetch_chat_messages(cid)
                         st.rerun()
                 with col_del:
-                    if st.button("✕", key=f"del_chat_{cid}", help=f"Delete '{ctitle}'"):
+                    if st.button("🗑️", key=f"del_chat_{cid}", help=f"Delete '{first_10_words}'"):
                         if delete_chat(cid):
                             if st.session_state.current_chat_id == cid:
                                 st.session_state.current_chat_id = None
                                 st.session_state.messages = []
+                            st.session_state.chats = None
                             st.rerun()
-                st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+                st.markdown("<div style='height: 3px;'></div>", unsafe_allow_html=True)
 
     st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
     st.divider()
@@ -1367,7 +1502,8 @@ with top_col1:
     """, unsafe_allow_html=True)
 
 with top_col2:
-    if st.button("＋ New chat", key="center_new_chat_btn", use_container_width=True, disabled=not backend_online):
+    center_greet = f"👋 Hello {st.session_state.get('user_first_name') or 'User'}! How are you?"
+    if st.button(center_greet, key="center_new_chat_btn", help="Start a new chat", use_container_width=True, disabled=not backend_online):
         st.session_state.current_chat_id = None
         st.session_state.current_chat_title = "New Conversation"
         st.session_state.messages = []
@@ -1414,80 +1550,35 @@ if not st.session_state.messages:
         </div>
     """, unsafe_allow_html=True)
 
-    # Purple Graphic Card matching the screenshot:
-    st.markdown("""
-        <div style="max-width: 440px; margin: 0 auto; text-align: center;">
-            <div style="background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 50%, #9333ea 100%); border-radius: 20px; padding: 22px 24px 16px 24px; box-shadow: 0 10px 30px rgba(124, 58, 237, 0.28); color: white; position: relative;">
-                <!-- Top pill bar inside purple card -->
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.72rem; opacity: 0.9;">
-                    <div style="background: rgba(255,255,255,0.22); padding: 3px 10px; border-radius: 12px; font-weight: 600; letter-spacing: 0.2px;">
-                        1900–2025 ▾
-                    </div>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <span style="font-size: 0.85rem;">📈</span>
-                        <span style="background: rgba(255,255,255,0.24); padding: 2px 7px; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">📊 ≡</span>
-                    </div>
-                </div>
-                <!-- Stylized Bar Chart SVG (1900 - 2025: 1, 2.5, 4.1, 6.1, 8.2) -->
-                <svg viewBox="0 0 320 135" style="width: 100%; height: auto; overflow: visible;">
-                    <!-- Grid Lines -->
-                    <line x1="0" y1="25" x2="320" y2="25" stroke="rgba(255,255,255,0.12)" stroke-dasharray="3,3"/>
-                    <line x1="0" y1="65" x2="320" y2="65" stroke="rgba(255,255,255,0.12)" stroke-dasharray="3,3"/>
-                    <line x1="0" y1="105" x2="320" y2="105" stroke="rgba(255,255,255,0.12)" stroke-dasharray="3,3"/>
-                    
-                    <!-- Bar 1: 1 -->
-                    <rect x="25" y="85" width="28" height="24" rx="3.5" fill="rgba(255,255,255,0.45)"/>
-                    <text x="39" y="78" fill="white" font-size="9.5" text-anchor="middle" font-weight="600">1</text>
-                    <text x="39" y="122" fill="rgba(255,255,255,0.65)" font-size="8.5" text-anchor="middle">1900</text>
-                    
-                    <!-- Bar 2: 2.5 -->
-                    <rect x="85" y="66" width="28" height="43" rx="3.5" fill="rgba(255,255,255,0.62)"/>
-                    <text x="99" y="59" fill="white" font-size="9.5" text-anchor="middle" font-weight="600">2.5</text>
-                    <text x="99" y="122" fill="rgba(255,255,255,0.65)" font-size="8.5" text-anchor="middle">1950</text>
-                    
-                    <!-- Bar 3: 4.1 -->
-                    <rect x="145" y="47" width="28" height="62" rx="3.5" fill="rgba(255,255,255,0.78)"/>
-                    <text x="159" y="40" fill="white" font-size="9.5" text-anchor="middle" font-weight="600">4.1</text>
-                    <text x="159" y="122" fill="rgba(255,255,255,0.65)" font-size="8.5" text-anchor="middle">1975</text>
-                    
-                    <!-- Bar 4: 6.1 -->
-                    <rect x="205" y="27" width="28" height="82" rx="3.5" fill="rgba(255,255,255,0.92)"/>
-                    <text x="219" y="20" fill="white" font-size="9.5" text-anchor="middle" font-weight="600">6.1</text>
-                    <text x="219" y="122" fill="rgba(255,255,255,0.65)" font-size="8.5" text-anchor="middle">2000</text>
-                    
-                    <!-- Bar 5: 8.2 (Tallest Hero Bar) -->
-                    <rect x="265" y="8" width="28" height="101" rx="3.5" fill="#ffffff"/>
-                    <text x="279" y="3" fill="white" font-size="10" text-anchor="middle" font-weight="700">8.2</text>
-                    <text x="279" y="122" fill="#ffffff" font-size="8.5" text-anchor="middle" font-weight="600">2025</text>
-                </svg>
-                <!-- Bottom player bar inside card -->
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.18); font-size: 0.72rem; opacity: 0.9;">
-                    <span style="letter-spacing: 2px;">⏮ ▶ ⏭</span>
-                    <div style="flex: 1; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; margin: 0 10px; position: relative;">
-                        <div style="position: absolute; left: 82%; top: -3.5px; width: 10px; height: 10px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.2);"></div>
-                    </div>
-                    <span>🔄</span>
-                </div>
-            </div>
-            
-            <!-- Title & Description Below Card -->
-            <div style="margin-top: 22px; margin-bottom: 12px;">
+    # Fetch current banner from rotating backend API (changes every 2s)
+    banner_info = api_get_current_banner()
+
+    # Original Image Graphic Card (No raw HTML code):
+    col_img_l, col_img_c, col_img_r = st.columns([1.1, 1.4, 1.1])
+    with col_img_c:
+        local_purple = os.path.join(os.path.dirname(__file__), "assets", "purple_chart.png")
+        if os.path.exists(local_purple):
+            st.image(local_purple, use_container_width=True)
+        else:
+            st.image(f"{BACKEND_BASE_URL}{banner_info.get('image_url', '/static/purple_chart.png')}", use_container_width=True)
+
+        b_title = banner_info.get("title", "GPT-6 with Intelligent UI")
+        b_sub = banner_info.get("subtitle", "Get visual and interactive answers to help you take the next step")
+        st.markdown(f"""
+            <div style="text-align: center; margin-top: 14px; margin-bottom: 12px;">
                 <h3 style="font-size: 1.35rem; font-weight: 700; color: #0d0d0d; margin: 0 0 6px 0; letter-spacing: -0.4px;">
-                    GPT-6 with Intelligent UI
+                    {b_title}
                 </h3>
                 <p style="font-size: 0.95rem; color: #6b7280; margin: 0 auto; line-height: 1.45; max-width: 380px;">
-                    Get visual and interactive answers to help you take the next step
+                    {b_sub}
                 </p>
             </div>
-        </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-    # Try GPT-6 Pill Button
-    col_t1, col_try_gpt, col_t2 = st.columns([1.3, 1.4, 1.3])
-    with col_try_gpt:
-        if st.button("Try GPT-6", key="btn_try_gpt6", use_container_width=True):
-            st.session_state._injected_prompt = "Explain GPT-6 with Intelligent UI and provide interactive visual insights for AI developments from 1900 to 2025."
-            st.toast("🚀 Switched to GPT-6 Intelligent UI mode!", icon="✨")
+        action_label = banner_info.get("action_text", "Try GPT-6")
+        if st.button(action_label, key="btn_try_gpt6", use_container_width=True):
+            st.session_state._injected_prompt = banner_info.get("prompt", "Explain GPT-6 with Intelligent UI.")
+            st.toast(f"🚀 {action_label} activated!", icon="✨")
             st.rerun()
 
 else:

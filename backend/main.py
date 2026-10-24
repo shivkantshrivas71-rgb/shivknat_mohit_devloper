@@ -47,8 +47,61 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import os
+import time
+from fastapi.staticfiles import StaticFiles
+
 # 3. Mount Modular Chat Backend Router
 app.include_router(chat_router)
+
+# 3a. Mount Static Files Directory
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+os.makedirs(STATIC_DIR, exist_ok=True)
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+# -------------------------------------------------------------
+# 3b. Rotating Banner Image API (Changes every 2 seconds)
+# -------------------------------------------------------------
+BANNER_SLIDES = [
+    {
+        "id": 1,
+        "title": "GPT-6 with Intelligent UI",
+        "subtitle": "Get visual and interactive answers to help you take the next step",
+        "image_url": "/static/purple_chart.png",
+        "action_text": "Try GPT-6",
+        "prompt": "Explain GPT-6 with Intelligent UI and provide interactive visual insights."
+    },
+    {
+        "id": 2,
+        "title": "Deep Reasoning & Thinking Mode",
+        "subtitle": "Solve complex coding, math, and architecture problems with step-by-step logic",
+        "image_url": "/static/reasoning_chart.png",
+        "action_text": "Try Think Mode",
+        "prompt": "Demonstrate deep reasoning step-by-step logic to build a modern scalable web application."
+    },
+    {
+        "id": 3,
+        "title": "Advanced Multimodal AI",
+        "subtitle": "Attach photos, PDFs, videos, or AI files and analyze instantly",
+        "image_url": "/static/multimodal_chart.png",
+        "action_text": "Explore Files",
+        "prompt": "How can I analyze complex images, PDFs and datasets using multimodal AI?"
+    }
+]
+
+@app.get("/banner/current", tags=["Banner"])
+def get_current_banner():
+    """Returns the active showcase banner card. Automatically rotates every 2 seconds."""
+    idx = int(time.time() // 2) % len(BANNER_SLIDES)
+    item = BANNER_SLIDES[idx].copy()
+    item["rotation_interval_seconds"] = 2
+    item["server_timestamp"] = time.time()
+    return item
+
+@app.get("/banner/slides", tags=["Banner"])
+def get_all_banner_slides():
+    """Returns all showcase banner slides."""
+    return {"slides": BANNER_SLIDES, "rotation_interval_seconds": 2}
 
 
 # -------------------------------------------------------------
