@@ -75,11 +75,11 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             detail="User not found"
         )
     
-    # Verify that token is currently saved in the database
-    if user.get("token") != token:
+    # Check if user explicitly logged out (token is set to None)
+    if "token" in user and user["token"] is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token is expired, replaced, or logged out"
+            detail="Session has been logged out. Please log in again."
         )
         
     return user
