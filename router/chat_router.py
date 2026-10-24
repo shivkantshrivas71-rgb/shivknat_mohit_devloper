@@ -1,10 +1,11 @@
 from datetime import datetime, timezone
 from typing import List
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from bson import ObjectId
 
 from database import get_chat_collection, get_message_collection
 from services.llm_service import llm_service
+from auth import get_current_user
 from router.schemas import (
     CreateChatRequest,
     CreateChatResponse,
@@ -28,7 +29,7 @@ def get_chat_filter(chat_id: str) -> dict:
 
 
 # -------------------------------------------------------------
-# 1. Create New Chat Session
+# 1. Create New Chat Session (Authenticated)
 # -------------------------------------------------------------
 @router.post(
     "/new",
@@ -36,19 +37,16 @@ def get_chat_filter(chat_id: str) -> dict:
     status_code=status.HTTP_201_CREATED,
     summary="Create a new conversation session"
 )
-async def create_new_chat(payload: CreateChatRequest):
+async def create_new_chat(
+    payload: CreateChatRequest,
+    current_user: dict = Depends(get_current_user)
+):
     """
-    Accepts user_id, creates a new chat document in MongoDB (chats collection)
-    with default title 'New Conversation' and timestamp, returns chat session details.
+    Creates a new chat document in MongoDB (chats collection)
+    tied to the authenticated user with default title 'New Conversation'.
     """
     chats = get_chat_collection()
-    user_id = payload.user_id.strip()
-
-    if not user_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="user_id is required to create a chat session."
-        )
+    user_id = str(current_user["_id"])
 
     now = datetime.now(timezone.utc)
     new_chat = {
@@ -68,20 +66,24 @@ async def create_new_chat(payload: CreateChatRequest):
 
 
 # -------------------------------------------------------------
-# 2. Fetch All Chat Sessions for a User
+# 2. Fetch All Chat Sessions for Authenticated User
 # -------------------------------------------------------------
 @router.get(
     "/{user_id}",
     response_model=List[ChatSessionResponse],
-    summary="Fetch all chat sessions for a specified user"
+    summary="Fetch all chat sessions for the authenticated user"
 )
-async def get_user_chats(user_id: str):
+async def get_user_chats(
+    user_id: str,
+    current_user: dict = Depends(get_current_user)
+):
     """
-    Fetches all chat sessions for the specified user_id,
+    Fetches all chat sessions for the authenticated user,
     sorted descending by creation time.
     """
+    auth_user_id = str(current_user["_id"])
     chats = get_chat_collection()
-    cursor = chats.find({"user_id": user_id.strip()}).sort("created_at", -1)
+    cursor = chats.find({"user_id": auth_user_id}).sort("created_at", -1)
     documents = await cursor.to_list(length=1000)
 
     chat_sessions = []
@@ -92,7 +94,7 @@ async def get_user_chats(user_id: str):
         chat_sessions.append(
             ChatSessionResponse(
                 chat_id=str(doc["_id"]),
-                user_id=doc.get("user_id", user_id),
+                user_id=doc.get("user_id", auth_user_id),
                 title=doc.get("title", "New Conversation"),
                 created_at=created_at_str
             )
@@ -109,13 +111,24 @@ async def get_user_chats(user_id: str):
     response_model=List[ChatMessageResponse],
     summary="Fetch message history for a specific chat"
 )
-async def get_chat_messages(chat_id: str):
+async def get_chat_messages(
+    chat_id: str,
+    current_user: dict = Depends(get_current_user)
+):
     """
     Fetches all message history for a given chat_id from the messages collection,
-    sorted ascending by timestamp.
+    ensuring the chat belongs to the authenticated user.
     """
+    chats = get_chat_collection()
     messages = get_message_collection()
-    cursor = messages.find({"chat_id": chat_id.strip()}).sort("timestamp", 1)
+    clean_chat_id = chat_id.strip()
+    auth_user_id = str(current_user["_id"])
+
+    chat = await chats.find_one(get_chat_filter(clean_chat_id))
+    if not chat or chat.get("user_id") != auth_user_id:
+        return []
+
+    cursor = messages.find({"chat_id": clean_chat_id}).sort("timestamp", 1)
     documents = await cursor.to_list(length=1000)
 
     history = []
@@ -126,10 +139,11 @@ async def get_chat_messages(chat_id: str):
         history.append(
             ChatMessageResponse(
                 id=str(doc["_id"]),
-                chat_id=doc.get("chat_id", chat_id),
+                chat_id=doc.get("chat_id", clean_chat_id),
                 user_id=doc.get("user_id"),
                 role=doc.get("role", "user"),
                 content=doc.get("content", ""),
+                model=doc.get("model"),
                 timestamp=timestamp_str
             )
         )
@@ -145,11 +159,14 @@ async def get_chat_messages(chat_id: str):
     response_model=SendMessageResponse,
     summary="Send message and receive AI reply via OpenRouter"
 )
-async def send_chat_message(payload: SendMessageRequest):
+async def send_chat_message(
+    payload: SendMessageRequest,
+    current_user: dict = Depends(get_current_user)
+):
     """
     Step 1: Save user incoming message to messages collection.
     Step 2: Query MongoDB for strictly the last 10 messages, reverse to chronological order.
-    Step 3: Call OpenRouter API with standard OpenAI schema and OPENROUTER_API_KEY.
+    Step 3: Call OpenRouter API with standard OpenAI schema and OPENROUTER_MODEL_NAME (.env).
     Step 4: Save AI response in messages collection.
     Step 5: Auto-title if title is 'New Conversation' with first 25 characters of prompt.
     Step 6: Return AI reply.
@@ -157,10 +174,12 @@ async def send_chat_message(payload: SendMessageRequest):
     chats = get_chat_collection()
     messages = get_message_collection()
 
-    clean_chat_id = payload.chat_id.strip()
-    clean_user_id = payload.user_id.strip()
+    clean_chat_id = payload.chat_id.strip() if payload.chat_id else ""
+    clean_user_id = str(current_user["_id"])
     clean_message = payload.message.strip()
-    model = payload.model_name.strip() if payload.model_name else "openai/gpt-3.5-turbo"
+    
+    # Resolve OpenRouter model from OPENROUTER_MODEL_NAME in .env
+    model = llm_service.get_model(payload.model_name)
 
     if not clean_message:
         raise HTTPException(
@@ -168,14 +187,22 @@ async def send_chat_message(payload: SendMessageRequest):
             detail="Message cannot be empty."
         )
 
-    # Verify chat session exists
-    chat_filter = get_chat_filter(clean_chat_id)
-    chat = await chats.find_one(chat_filter)
-    if not chat:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Chat session not found."
-        )
+    # Verify chat session exists and belongs to authenticated user, or auto-create if missing
+    chat_filter = get_chat_filter(clean_chat_id) if clean_chat_id else None
+    chat = await chats.find_one(chat_filter) if chat_filter else None
+
+    if not chat or chat.get("user_id") != clean_user_id:
+        now = datetime.now(timezone.utc)
+        new_chat_doc = {
+            "user_id": clean_user_id,
+            "title": clean_message[:25] + ("..." if len(clean_message) > 25 else ""),
+            "created_at": now,
+            "updated_at": now
+        }
+        res = await chats.insert_one(new_chat_doc)
+        clean_chat_id = str(res.inserted_id)
+        chat = new_chat_doc
+        chat_filter = get_chat_filter(clean_chat_id)
 
     # Step 1: Save the user's incoming message to the messages collection
     now = datetime.now(timezone.utc)
@@ -212,6 +239,7 @@ async def send_chat_message(payload: SendMessageRequest):
         "user_id": clean_user_id,
         "role": "assistant",
         "content": ai_reply,
+        "model": model,
         "timestamp": datetime.now(timezone.utc)
     }
     await messages.insert_one(ai_msg_doc)
@@ -230,7 +258,8 @@ async def send_chat_message(payload: SendMessageRequest):
     return SendMessageResponse(
         chat_id=clean_chat_id,
         reply=ai_reply,
-        role="assistant"
+        role="assistant",
+        model=model
     )
 
 
@@ -242,7 +271,10 @@ async def send_chat_message(payload: SendMessageRequest):
     response_model=DeleteChatResponse,
     summary="Delete chat session and all associated messages"
 )
-async def delete_chat(chat_id: str):
+async def delete_chat(
+    chat_id: str,
+    current_user: dict = Depends(get_current_user)
+):
     """
     Cleans up/deletes the chat session and its associated messages.
     """
@@ -250,19 +282,48 @@ async def delete_chat(chat_id: str):
     messages = get_message_collection()
 
     clean_chat_id = chat_id.strip()
+    auth_user_id = str(current_user["_id"])
     chat_filter = get_chat_filter(clean_chat_id)
 
-    delete_result = await chats.delete_one(chat_filter)
-    if delete_result.deleted_count == 0:
+    chat = await chats.find_one(chat_filter)
+    if not chat:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Chat session not found."
         )
 
-    # Delete all associated messages matching this chat_id
+    if chat.get("user_id") != auth_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access forbidden: you do not own this chat session."
+        )
+
+    await chats.delete_one(chat_filter)
     await messages.delete_many({"chat_id": clean_chat_id})
 
     return DeleteChatResponse(
         message="Chat session and associated message history deleted successfully.",
         chat_id=clean_chat_id
     )
+
+
+# -------------------------------------------------------------
+# 6. Active Model Route
+# -------------------------------------------------------------
+@router.get(
+    "/model/active",
+    summary="Get currently configured OpenRouter model"
+)
+async def get_active_model():
+    """Return the active OpenRouter model configured in the backend (.env)."""
+    import os
+    from dotenv import load_dotenv
+    load_dotenv(override=True)
+    env_model = os.getenv("OPENROUTER_MODEL_NAME", "").strip()
+    active_model = llm_service.get_model()
+    return {
+        "active_model": active_model,
+        "source": "OPENROUTER_MODEL_NAME (.env)" if env_model else "default_fallback",
+        "is_env_configured": bool(env_model)
+    }
+

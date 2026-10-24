@@ -53,9 +53,11 @@ app.include_router(chat_router)
 @app.get("/", tags=["General"])
 def home():
     """Return health check and API documentation link."""
+    from services.llm_service import llm_service
     return {
         "status": "healthy",
         "message": "ChatBOT User Authentication API is running smoothly",
+        "openrouter_model": llm_service.get_model(),
         "docs_url": "/docs"
     }
 
@@ -267,6 +269,25 @@ async def user_login(user_data: UserLogin):
             is_email_verified=user.get("is_email_verified", False)
         )
     )
+
+
+# -------------------------------------------------------------
+# 7b. User Logout
+# -------------------------------------------------------------
+@app.post(
+    "/user/logout",
+    response_model=MessageResponse,
+    status_code=status.HTTP_200_OK,
+    tags=["Authentication"]
+)
+async def user_logout(current_user: dict = Depends(get_current_user)):
+    """Invalidate current session token in MongoDB for authenticated user."""
+    users = get_user_collection()
+    await users.update_one(
+        {"_id": current_user["_id"]},
+        {"$set": {"token": None}}
+    )
+    return MessageResponse(message="Logged out successfully.")
 
 
 # -------------------------------------------------------------
