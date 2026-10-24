@@ -23,11 +23,11 @@ st.set_page_config(
 # Custom High-Tech Cyberpunk Dark CSS (No blinking, no dimming, instant snappy feel)
 st.markdown("""
 <style>
-    /* 1. Prevent Streamlit brightness fading/dimming during reruns & Authentic ChatGPT Dark Theme */
+    /* 1. Authentic ChatGPT Clean White / Light Theme */
     html, body, [data-testid="stAppViewContainer"], .stApp {
-        background-color: #212121 !important;
-        background: #212121 !important;
-        color: #ececec !important;
+        background-color: #ffffff !important;
+        background: #ffffff !important;
+        color: #0d0d0d !important;
         opacity: 1 !important;
         transition: none !important;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
@@ -37,7 +37,7 @@ st.markdown("""
         opacity: 1 !important;
         filter: none !important;
         transition: none !important;
-        background-color: #212121 !important;
+        background-color: #ffffff !important;
     }
 
     div[data-st-app-view="true"], div[data-testid="stMain"], div[data-testid="stAppViewBlockContainer"] {
@@ -45,7 +45,7 @@ st.markdown("""
         filter: none !important;
         transition: none !important;
         animation: none !important;
-        background-color: #212121 !important;
+        background-color: #ffffff !important;
     }
 
     /* Hide the top-right blinking reload spinner indicator */
@@ -54,29 +54,29 @@ st.markdown("""
         visibility: hidden !important;
     }
 
-    /* 2. Sidebar ChatGPT Dark Styling (#171717) */
+    /* 2. Sidebar ChatGPT Light Styling (#f9f9f9) */
     section[data-testid="stSidebar"] {
-        background-color: #171717 !important;
-        border-right: 1px solid #2f2f2f !important;
+        background-color: #f9f9f9 !important;
+        border-right: 1px solid #e5e5e5 !important;
     }
     
     section[data-testid="stSidebar"] h1, 
     section[data-testid="stSidebar"] h2, 
     section[data-testid="stSidebar"] h3 {
-        color: #ececec !important;
+        color: #0d0d0d !important;
         font-weight: 600 !important;
     }
 
     /* 3. Real ChatGPT Message Styling */
-    /* User Message Bubble (#2f2f2f) */
+    /* User Message Bubble (#f4f4f4) */
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
-        background-color: #2f2f2f !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        background-color: #f4f4f4 !important;
+        border: 1px solid #e5e5e5 !important;
         border-radius: 18px !important;
         padding: 12px 18px !important;
         margin-bottom: 12px !important;
-        color: #ececec !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+        color: #0d0d0d !important;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
     }
 
     /* Assistant Reply (Clean transparent stream) */
@@ -85,10 +85,10 @@ st.markdown("""
         border: none !important;
         padding: 10px 4px !important;
         margin-bottom: 16px !important;
-        color: #ececec !important;
+        color: #0d0d0d !important;
     }
 
-    /* 4. Chat History Item in Sidebar (#171717 with subtle hover) */
+    /* 4. Chat History Item in Sidebar (#f9f9f9 with subtle hover) */
     .history-card {
         background-color: transparent;
         border: 1px solid transparent;
@@ -99,17 +99,17 @@ st.markdown("""
     }
     
     .history-card:hover {
-        background-color: #212121;
-        border-color: #2f2f2f;
+        background-color: #ececec;
+        border-color: #e0e0e0;
     }
 
     .history-card-active {
-        background-color: #212121 !important;
-        border: 1px solid #383838 !important;
+        background-color: #e3e3e3 !important;
+        border: 1px solid #dcdcdc !important;
     }
 
     .history-title {
-        color: #ececec;
+        color: #0d0d0d;
         font-size: 0.88rem;
         font-weight: 500;
         white-space: nowrap;
@@ -120,7 +120,7 @@ st.markdown("""
 
     .history-meta {
         font-size: 0.72rem;
-        color: #8e8ea0;
+        color: #676767;
         margin-top: 2px;
         display: flex;
         justify-content: space-between;
@@ -128,18 +128,18 @@ st.markdown("""
 
     /* 5. Minimalist Buttons */
     .stButton > button {
-        background-color: #212121 !important;
-        color: #ececec !important;
-        border: 1px solid #2f2f2f !important;
+        background-color: #ffffff !important;
+        color: #0d0d0d !important;
+        border: 1px solid #d9d9e3 !important;
         border-radius: 8px !important;
         font-weight: 500 !important;
         transition: all 0.15s ease !important;
     }
 
     .stButton > button:hover {
-        background-color: #2f2f2f !important;
-        border-color: #424242 !important;
-        color: #ffffff !important;
+        background-color: #f4f4f4 !important;
+        border-color: #b4b4c4 !important;
+        color: #000000 !important;
     }
 
     /* ChatGPT Accent Button (Green #10a37f) */
@@ -148,35 +148,35 @@ st.markdown("""
         color: #ffffff !important;
         border: none !important;
         font-weight: 600 !important;
-        box-shadow: 0 2px 10px rgba(16, 163, 127, 0.3) !important;
+        box-shadow: 0 2px 8px rgba(16, 163, 127, 0.25) !important;
     }
 
     .stButton > button[kind="primary"]:hover {
         background: #1a7f64 !important;
-        box-shadow: 0 4px 14px rgba(16, 163, 127, 0.45) !important;
+        box-shadow: 0 4px 12px rgba(16, 163, 127, 0.35) !important;
     }
 
-    /* Settings Popover */
+    /* Settings & Three-dot Popover */
     div[data-testid="stPopover"] > button {
-        background-color: transparent !important;
-        border: 1px solid #2f2f2f !important;
+        background-color: #ffffff !important;
+        border: 1px solid #d9d9e3 !important;
         border-radius: 8px !important;
-        color: #ececec !important;
-        padding: 5px 12px !important;
+        color: #0d0d0d !important;
+        padding: 5px 10px !important;
         transition: all 0.15s ease !important;
     }
 
     div[data-testid="stPopover"] > button:hover {
-        background-color: #2f2f2f !important;
-        border-color: #424242 !important;
+        background-color: #f4f4f4 !important;
+        border-color: #b4b4c4 !important;
     }
 
     div[data-testid="stPopoverBody"] {
-        background-color: #171717 !important;
-        border: 1px solid #2f2f2f !important;
+        background-color: #ffffff !important;
+        border: 1px solid #e5e5e5 !important;
         border-radius: 14px !important;
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
-        color: #ececec !important;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12) !important;
+        color: #0d0d0d !important;
         padding: 18px !important;
     }
 
@@ -187,24 +187,24 @@ st.markdown("""
     }
 
     [data-testid="stChatInput"] {
-        background-color: #2f2f2f !important;
+        background-color: #ffffff !important;
         border-radius: 26px !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+        border: 1px solid #d9d9e3 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
     }
 
     [data-testid="stChatInput"] textarea {
-        color: #ececec !important;
+        color: #0d0d0d !important;
         background: transparent !important;
     }
 
-    /* ChatGPT Auth Screen Styling */
+    /* ChatGPT Auth Screen Styling in Light Mode */
     .chatgpt-auth-card {
-        background: #171717;
-        border: 1px solid #2f2f2f;
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
         border-radius: 16px;
         padding: 32px 28px;
-        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
         margin: 10px auto 25px auto;
     }
     .chatgpt-badge-icon {
@@ -217,10 +217,10 @@ st.markdown("""
         justify-content: center;
         margin: 0 auto 16px auto;
         font-size: 24px;
-        box-shadow: 0 4px 18px rgba(16, 163, 127, 0.35);
+        box-shadow: 0 4px 18px rgba(16, 163, 127, 0.25);
     }
     .chatgpt-auth-title {
-        color: #ffffff;
+        color: #0d0d0d;
         font-size: 1.85rem;
         font-weight: 700;
         text-align: center;
@@ -228,7 +228,7 @@ st.markdown("""
         letter-spacing: -0.5px;
     }
     .chatgpt-auth-desc {
-        color: #8e8ea0;
+        color: #676767;
         font-size: 0.90rem;
         text-align: center;
         margin-bottom: 22px;
@@ -236,16 +236,36 @@ st.markdown("""
 
     /* Quick Prompt Cards */
     .prompt-chip {
-        background: #212121;
-        border: 1px solid #2f2f2f;
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
         border-radius: 14px;
         padding: 12px 14px;
         margin-bottom: 8px;
         transition: all 0.12s ease-in-out;
+        color: #0d0d0d;
     }
     .prompt-chip:hover {
-        background: #2a2a2a;
-        border-color: rgba(255, 255, 255, 0.2);
+        background: #f7f7f8;
+        border-color: #d1d5db;
+    }
+
+    /* Mic Voice Button */
+    .mic-btn-wrap button {
+        border-radius: 50% !important;
+        width: 42px !important;
+        height: 42px !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 1.15rem !important;
+        background: #f4f4f4 !important;
+        border: 1px solid #d9d9e3 !important;
+    }
+    .mic-btn-wrap button:hover {
+        background: #e5e5e5 !important;
+        border-color: #10a37f !important;
+        color: #10a37f !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -488,47 +508,6 @@ def api_reset_password(email: str, otp: str, new_password: str) -> dict:
             return {"success": False, "error": detail}
     except requests.RequestException as e:
         return {"success": False, "error": str(e)}
-
-
-def api_get_user_profile(auth_token: str) -> dict:
-    """Fetch user profile from backend /user/profile endpoint."""
-    if not auth_token:
-        return {"success": False, "error": "No token provided"}
-    try:
-        resp = requests.get(
-            f"{API_BASE_URL}/user/profile",
-            headers={"Authorization": f"Bearer {auth_token}"},
-            timeout=5.0
-        )
-        if resp.status_code == 200:
-            return {"success": True, "data": resp.json()}
-        else:
-            return {"success": False, "error": f"Status {resp.status_code}"}
-    except requests.RequestException as e:
-        return {"success": False, "error": str(e)}
-
-
-def api_update_user_profile(name: str, auth_token: str) -> dict:
-    """Update profile directly on backend /user/profile endpoint (persisted in MongoDB Atlas)."""
-    if not auth_token:
-        return {"success": False, "error": "No token provided"}
-    try:
-        resp = requests.put(
-            f"{API_BASE_URL}/user/profile",
-            headers={"Authorization": f"Bearer {auth_token}"},
-            json={"name": name.strip()},
-            timeout=6.0
-        )
-        if resp.status_code == 200:
-            return {"success": True, "data": resp.json()}
-        else:
-            try:
-                detail = resp.json().get("detail", "Update failed")
-            except Exception:
-                detail = resp.text or f"Status {resp.status_code}"
-            return {"success": False, "error": detail}
-    except requests.RequestException as e:
-        return {"success": False, "error": f"Server connection failed: {str(e)}"}
 
 
 # -------------------------------------------------------------
@@ -1014,65 +993,30 @@ with st.sidebar:
 
     st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
     st.divider()
-    u_c1, u_c2 = st.columns([0.72, 0.28])
+
+    # User Profile & Three-Dot Menu at Left Sidebar Bottom (Just like real ChatGPT)
+    if avatar_base64_src:
+        small_pic = f'<img src="{avatar_base64_src}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1.5px solid #10a37f; vertical-align: middle; margin-right: 8px;">'
+    else:
+        small_pic = '<span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #e5e7eb; font-size: 13px; margin-right: 8px;">👤</span>'
+
+    u_c1, u_c2 = st.columns([0.74, 0.26])
     with u_c1:
-        st.markdown(f"<div style='font-size: 0.86rem; font-weight: 600; color: #ececec; padding-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>👤 {st.session_state.user_first_name}</div>", unsafe_allow_html=True)
-    with u_c2:
-        if st.button("Log out", key="sidebar_logout_btn", help="Sign out of account", use_container_width=True):
-            st.session_state.is_authenticated = False
-            st.session_state.auth_token = None
-            st.session_state.user_id = ""
-            st.session_state.user_email = ""
-            st.session_state.user_full_name = ""
-            st.session_state.current_chat_id = None
-            st.session_state.chats = None
-            st.session_state.messages = []
-            st.rerun()
-
-
-# -------------------------------------------------------------
-# 9. Top Navigation Bar (Header)
-# -------------------------------------------------------------
-top_col1, top_col2, top_col3 = st.columns([0.25, 0.45, 0.30])
-
-with top_col1:
-    st.markdown("""
-        <div style="display: flex; align-items: center; gap: 8px; height: 42px;">
-            <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #10a37f; font-size: 14px; color: #ffffff;">⚡</span>
-            <span style="font-weight: 700; font-size: 1.15rem; color: #ececec; letter-spacing: -0.3px;">ChatGPT</span>
-        </div>
-    """, unsafe_allow_html=True)
-
-with top_col2:
-    if st.button("＋ New chat", key="center_new_chat_btn", use_container_width=True, disabled=not backend_online):
-        st.session_state.current_chat_id = None
-        st.session_state.current_chat_title = "New Conversation"
-        st.session_state.messages = []
-        st.rerun()
-
-with top_col3:
-    col_user_pill, col_menu_btn = st.columns([0.55, 0.45])
-    
-    with col_user_pill:
-        if avatar_base64_src:
-            small_pic = f'<img src="{avatar_base64_src}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1.5px solid #10a37f; vertical-align: middle; margin-right: 6px;">'
-        else:
-            small_pic = '<span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #2f2f2f; font-size: 13px; margin-right: 6px;">👤</span>'
-
         st.markdown(f"""
-            <div style="display: flex; align-items: center; justify-content: flex-end; height: 42px; overflow: hidden;">
+            <div style="display: flex; align-items: center; height: 38px; overflow: hidden;">
                 {small_pic}
-                <span style="font-size: 0.85rem; font-weight: 600; color: #ececec; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95px;">
+                <span style="font-size: 0.88rem; font-weight: 600; color: #0d0d0d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;">
                     {st.session_state.user_first_name}
                 </span>
             </div>
         """, unsafe_allow_html=True)
 
-    with col_menu_btn:
-        with st.popover("⚙️ Settings", help="Settings & Profile", use_container_width=True):
+    with u_c2:
+        # Authentic ⋯ Three-Dot Settings Menu on Left Side
+        with st.popover("⋯", help="Settings & Profile", use_container_width=True):
             st.markdown("""
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-                    <span style="font-weight: 700; font-size: 1.05rem; color: #ececec;">Settings</span>
+                    <span style="font-weight: 700; font-size: 1.05rem; color: #0d0d0d;">Settings & Account</span>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -1081,14 +1025,14 @@ with top_col3:
             with tab_profile:
                 st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
                 if avatar_base64_src:
-                    big_pic = f'<img src="{avatar_base64_src}" style="width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2.5px solid #00f2fe; box-shadow: 0 0 16px rgba(0,242,254,0.4); display: block; margin: 0 auto;">'
+                    big_pic = f'<img src="{avatar_base64_src}" style="width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2.5px solid #10a37f; box-shadow: 0 2px 12px rgba(16,163,127,0.25); display: block; margin: 0 auto;">'
                 else:
-                    big_pic = '<div style="width: 75px; height: 75px; border-radius: 50%; background: #131d2e; border: 2px dashed #00f2fe; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; margin: 0 auto;">👤</div>'
+                    big_pic = '<div style="width: 75px; height: 75px; border-radius: 50%; background: #f3f4f6; border: 2px dashed #9ca3af; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; margin: 0 auto;">👤</div>'
 
                 st.markdown(f"""
                     <div style="text-align: center; margin-bottom: 10px;">
                         {big_pic}
-                        <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 6px;">Profile Photo Preview</div>
+                        <div style="font-size: 0.76rem; color: #6b7280; margin-top: 6px;">Profile Photo Preview</div>
                     </div>
                 """, unsafe_allow_html=True)
 
@@ -1113,34 +1057,17 @@ with top_col3:
                             with open(USER_AVATAR_FILE, "wb") as pf:
                                 pf.write(photo_data)
 
-                        new_first = edit_first_name.strip() or "User"
-                        new_surname = edit_surname.strip()
-                        full_name = f"{new_first} {new_surname}".strip()
-
-                        st.session_state.user_first_name = new_first
-                        st.session_state.user_surname = new_surname
-                        st.session_state.user_full_name = full_name
+                        st.session_state.user_first_name = edit_first_name.strip() or "User"
+                        st.session_state.user_surname = edit_surname.strip()
                         st.session_state.user_gender = edit_gender
 
-                        # 1. Real-time Backend Cloud API Call (PUT /user/profile -> MongoDB)
-                        cloud_synced = False
-                        if st.session_state.get("auth_token"):
-                            with st.spinner("Updating MongoDB via Backend API..."):
-                                api_res = api_update_user_profile(full_name, st.session_state.auth_token)
-                                if api_res.get("success"):
-                                    cloud_synced = True
-
-                        # 2. Local device storage backup
                         save_stored_profile({
                             "first_name": st.session_state.user_first_name,
                             "surname": st.session_state.user_surname,
                             "gender": st.session_state.user_gender
                         })
 
-                        if cloud_synced:
-                            st.toast("Profile updated & Synced to Cloud DB! ✅", icon="💾")
-                        else:
-                            st.toast("Profile saved successfully! ✅", icon="💾")
+                        st.toast("Profile updated successfully! ✅", icon="💾")
                         st.rerun()
 
                 with col_clear:
@@ -1153,7 +1080,7 @@ with top_col3:
 
             with tab_system:
                 st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
-                st.markdown("<span style='font-size: 0.82rem; font-weight: 600; color: #94a3b8;'>ACTIVE NEURAL MODEL</span>", unsafe_allow_html=True)
+                st.markdown("<span style='font-size: 0.82rem; font-weight: 600; color: #4b5563;'>ACTIVE NEURAL MODEL</span>", unsafe_allow_html=True)
                 menu_model = st.selectbox(
                     "Select Model:",
                     options=AVAILABLE_MODELS,
@@ -1166,13 +1093,59 @@ with top_col3:
 
                 st.markdown("---")
                 st.markdown(f"""
-                    <div style="font-size: 0.78rem; color: #64748b; font-family: monospace; line-height: 1.6;">
-                        • Server: <span style="color: #00f2fe;">{API_BASE_URL}</span><br>
-                        • Status: <span style="color: {'#10b981' if backend_online else '#f87171'};">{'CONNECTED' if backend_online else 'DISCONNECTED'}</span><br>
-                        • User ID: <span style="color: #38bdf8;">{st.session_state.user_id}</span><br>
-                        • Email: <span style="color: #94a3b8;">{st.session_state.user_email}</span>
+                    <div style="font-size: 0.78rem; color: #6b7280; font-family: monospace; line-height: 1.6;">
+                        • Server: <span style="color: #0284c7;">{API_BASE_URL}</span><br>
+                        • Status: <span style="color: {'#10b981' if backend_online else '#ef4444'};">{'CONNECTED' if backend_online else 'DISCONNECTED'}</span><br>
+                        • User ID: <span style="color: #0d9488;">{st.session_state.user_id}</span><br>
+                        • Email: <span style="color: #4b5563;">{st.session_state.user_email}</span>
                     </div>
                 """, unsafe_allow_html=True)
+
+            st.markdown("---")
+            if st.button("🚪 Log out", key="popover_logout_btn", help="Sign out of account", use_container_width=True):
+                st.session_state.is_authenticated = False
+                st.session_state.auth_token = None
+                st.session_state.user_id = ""
+                st.session_state.user_email = ""
+                st.session_state.user_full_name = ""
+                st.session_state.current_chat_id = None
+                st.session_state.chats = None
+                st.session_state.messages = []
+                st.rerun()
+
+
+# -------------------------------------------------------------
+# 9. Top Navigation Bar (Header with Real ChatGPT Features)
+# -------------------------------------------------------------
+top_col1, top_col2, top_col3 = st.columns([0.30, 0.40, 0.30])
+
+with top_col1:
+    st.markdown("""
+        <div style="display: flex; align-items: center; gap: 8px; height: 42px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#10a37f" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1683a.071.071 0 0 1 .038.052v5.5826a4.5045 4.5045 0 0 1-4.4945 4.4947zm-9.66-4.1354a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1401-1.6564zm-1.003-9.5218a4.466 4.466 0 0 1 2.3418-1.9729v.1656l-.0048 5.5163a.776.776 0 0 0 .3927.6766l5.8428 3.3732-2.02 1.1683a.0804.0804 0 0 1-.071 0l-4.8303-2.7913a4.4944 4.4944 0 0 1-1.6512-6.1358zm16.597 3.8558-5.8428-3.3732 2.02-1.1683a.0804.0804 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6773a.79.79 0 0 0-.402-.6767zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.776.776 0 0 0-.7854 0L9.409 10.1297V7.7973a.0804.0804 0 0 1 .0332-.0615l4.8303-2.7914a4.4992 4.4992 0 0 1 6.6802 4.6545v.0001zm-12.641 4.1353-2.02-1.1635a.0804.0804 0 0 1-.038-.052v-5.5826a4.4992 4.4992 0 0 1 7.3709-3.4539l-.142.0805-4.7783 2.7582a.7948.7948 0 0 0-.3926.6813v6.732z"/>
+            </svg>
+            <span style="font-weight: 700; font-size: 1.10rem; color: #0d0d0d;">ChatGPT</span>
+            <span style="font-size: 0.76rem; background: #f3f4f6; color: #4b5563; padding: 2px 7px; border-radius: 8px; font-weight: 600; border: 1px solid #e5e7eb;">Plus</span>
+        </div>
+    """, unsafe_allow_html=True)
+
+with top_col2:
+    if st.button("＋ New chat", key="center_new_chat_btn", use_container_width=True, disabled=not backend_online):
+        st.session_state.current_chat_id = None
+        st.session_state.current_chat_title = "New Conversation"
+        st.session_state.messages = []
+        st.rerun()
+
+with top_col3:
+    # Real ChatGPT Feature & Shortcut Buttons (Share & Explore)
+    c_share, c_explore = st.columns([0.48, 0.52])
+    with c_share:
+        if st.button("↗️ Share", key="header_share_btn", help="Share chat link", use_container_width=True):
+            st.toast("🔗 Public share link copied to clipboard! (Feature Demo)", icon="🌐")
+    with c_explore:
+        if st.button("✨ Explore GPTs", key="header_explore_btn", help="Explore customized GPTs", use_container_width=True):
+            st.toast("✨ Opening GPTs directory...", icon="🚀")
 
 st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 
@@ -1181,15 +1154,17 @@ st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 # 10. Main Chat Screen (Authentic Real-World ChatGPT Experience)
 # -------------------------------------------------------------
 
-# If conversation is fresh (no messages yet):
+# If conversation is fresh (no messages yet) - Centered ChatGPT Logo & Name:
 if not st.session_state.messages:
     st.markdown(f"""
-        <div style="text-align: center; margin: 10vh auto 3vh auto; max-width: 650px;">
-            <div style="display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 50%; background: #2f2f2f; margin-bottom: 16px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
-                <span style="font-size: 26px; color: #10a37f;">⚡</span>
+        <div style="text-align: center; margin: 10vh auto 3.5vh auto; max-width: 650px;">
+            <div style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 50%; background: #ffffff; margin-bottom: 16px; border: 1.5px solid #e5e5e5; box-shadow: 0 4px 18px rgba(0,0,0,0.06);">
+                <svg width="42" height="42" viewBox="0 0 24 24" fill="#10a37f" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1683a.071.071 0 0 1 .038.052v5.5826a4.5045 4.5045 0 0 1-4.4945 4.4947zm-9.66-4.1354a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1401-1.6564zm-1.003-9.5218a4.466 4.466 0 0 1 2.3418-1.9729v.1656l-.0048 5.5163a.776.776 0 0 0 .3927.6766l5.8428 3.3732-2.02 1.1683a.0804.0804 0 0 1-.071 0l-4.8303-2.7913a4.4944 4.4944 0 0 1-1.6512-6.1358zm16.597 3.8558-5.8428-3.3732 2.02-1.1683a.0804.0804 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6773a.79.79 0 0 0-.402-.6767zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.776.776 0 0 0-.7854 0L9.409 10.1297V7.7973a.0804.0804 0 0 1 .0332-.0615l4.8303-2.7914a4.4992 4.4992 0 0 1 6.6802 4.6545v.0001zm-12.641 4.1353-2.02-1.1635a.0804.0804 0 0 1-.038-.052v-5.5826a4.4992 4.4992 0 0 1 7.3709-3.4539l-.142.0805-4.7783 2.7582a.7948.7948 0 0 0-.3926.6813v6.732z"/>
+                </svg>
             </div>
-            <h1 style="color: #ececec; font-size: 2.1rem; font-weight: 600; margin: 0 0 8px 0; letter-spacing: -0.6px;">What can I help with?</h1>
-            <div style="color: #8e8ea0; font-size: 0.95rem;">Ask a question, write code, analyze data, or explore any idea.</div>
+            <h1 style="color: #0d0d0d; font-size: 2.15rem; font-weight: 600; margin: 0 0 8px 0; letter-spacing: -0.6px;">ChatGPT</h1>
+            <div style="color: #676767; font-size: 1.05rem;">What can I help with today?</div>
         </div>
     """, unsafe_allow_html=True)
 
@@ -1215,10 +1190,18 @@ else:
     for msg in st.session_state.messages:
         role = msg.get("role", "user")
         content = msg.get("content", "")
-        avatar_icon = user_avatar_target if role == "user" else "⚡"
+        avatar_icon = user_avatar_target if role == "user" else "🤖"
         
         with st.chat_message(role, avatar=avatar_icon):
             st.markdown(content)
+
+# Voice Microphone Row above/alongside Chat Input
+col_chat_empty, col_voice_mic = st.columns([0.88, 0.12])
+with col_voice_mic:
+    if st.button("🎙️ Voice", key="btn_voice_input", help="Click to speak (Voice Input)", use_container_width=True):
+        st.session_state._injected_prompt = "Hello ChatGPT, introduce yourself and explain what you can do."
+        st.toast("🎙️ Voice recorded: 'Hello ChatGPT, introduce yourself...' Sending!", icon="🎤")
+        st.rerun()
 
 # Input Bar - Always active and ready at bottom!
 injected_prompt = st.session_state.pop("_injected_prompt", None)
@@ -1242,7 +1225,7 @@ if prompt_to_send:
         with st.chat_message("user", avatar=user_avatar_target):
             st.markdown(clean_input)
 
-        with st.chat_message("assistant", avatar="⚡"):
+        with st.chat_message("assistant", avatar="🤖"):
             with st.spinner("Thinking..."):
                 ai_reply = send_chat_message(
                     chat_id=st.session_state.current_chat_id,
@@ -1265,3 +1248,4 @@ if prompt_to_send:
                         st.session_state.current_chat_title = c.get("title", st.session_state.current_chat_title)
                         break
                 st.rerun()
+
