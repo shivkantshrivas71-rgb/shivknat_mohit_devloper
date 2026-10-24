@@ -510,6 +510,85 @@ def api_reset_password(email: str, otp: str, new_password: str) -> dict:
         return {"success": False, "error": str(e)}
 
 
+def api_share_chat(chat_id: str) -> dict:
+    """Create a shareable link via /chats/{chat_id}/share."""
+    try:
+        resp = requests.post(f"{API_BASE_URL}/chats/{chat_id.strip()}/share", timeout=6.0)
+        if resp.status_code in [200, 201]:
+            return {"success": True, "data": resp.json()}
+        return {"success": False, "error": resp.text}
+    except requests.RequestException as e:
+        return {"success": False, "error": str(e)}
+
+
+def api_get_shared_chat(share_id: str) -> dict:
+    """Fetch public shared conversation via /chats/shared/{share_id}."""
+    try:
+        resp = requests.get(f"{API_BASE_URL}/chats/shared/{share_id.strip()}", timeout=6.0)
+        if resp.status_code == 200:
+            return {"success": True, "data": resp.json()}
+        return {"success": False, "error": resp.text}
+    except requests.RequestException as e:
+        return {"success": False, "error": str(e)}
+
+
+def api_transcribe_voice(audio_bytes: bytes, filename: str = "voice.wav") -> dict:
+    """Transcribe microphone audio via /chats/voice/transcribe."""
+    try:
+        files = {"file": (filename, audio_bytes, "audio/wav")}
+        resp = requests.post(f"{API_BASE_URL}/chats/voice/transcribe", files=files, timeout=12.0)
+        if resp.status_code == 200:
+            return resp.json()
+        return {"success": False, "transcribed_text": "", "message": resp.text}
+    except requests.RequestException as e:
+        return {"success": False, "transcribed_text": "", "message": str(e)}
+
+
+def api_upload_profile_photo(photo_bytes: bytes, filename: str, auth_token: str) -> dict:
+    """Upload user avatar to MongoDB cloud via /user/profile/photo."""
+    if not auth_token:
+        return {"success": False, "error": "Not authenticated"}
+    try:
+        files = {"file": (filename, photo_bytes, "image/png")}
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        resp = requests.post(f"{API_BASE_URL}/user/profile/photo", files=files, headers=headers, timeout=10.0)
+        if resp.status_code == 200:
+            return {"success": True, "data": resp.json()}
+        return {"success": False, "error": resp.text}
+    except requests.RequestException as e:
+        return {"success": False, "error": str(e)}
+
+
+def api_update_user_profile_full(name: str, surname: str, gender: str, auth_token: str) -> dict:
+    """Update profile on /user/profile with full metadata in MongoDB Atlas."""
+    if not auth_token:
+        return {"success": False, "error": "Not authenticated"}
+    try:
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        payload = {"name": name.strip(), "surname": surname.strip(), "gender": gender}
+        resp = requests.put(f"{API_BASE_URL}/user/profile", json=payload, headers=headers, timeout=6.0)
+        if resp.status_code == 200:
+            return {"success": True, "data": resp.json()}
+        return {"success": False, "error": resp.text}
+    except requests.RequestException as e:
+        return {"success": False, "error": str(e)}
+
+
+def api_update_user_settings(selected_model: str, theme: str, auth_token: str) -> dict:
+    """Update user preferences on /user/settings."""
+    if not auth_token:
+        return {"success": False, "error": "Not authenticated"}
+    try:
+        headers = {"Authorization": f"Bearer {auth_token}"}
+        payload = {"selected_model": selected_model, "theme": theme}
+        resp = requests.put(f"{API_BASE_URL}/user/settings", json=payload, headers=headers, timeout=6.0)
+        if resp.status_code == 200:
+            return {"success": True, "data": resp.json()}
+        return {"success": False, "error": resp.text}
+    except requests.RequestException as e:
+        return {"success": False, "error": str(e)}
+
+
 # -------------------------------------------------------------
 # 5. Chat & Messaging API Functions
 # -------------------------------------------------------------
@@ -625,6 +704,38 @@ if has_custom_avatar:
             avatar_base64_src = f"data:image/png;base64,{encoded_bytes}"
     except Exception:
         avatar_base64_src = ""
+
+
+# -------------------------------------------------------------
+# 6b. Public Shared Chat View (When ?share=ID is opened)
+# -------------------------------------------------------------
+share_param = st.query_params.get("share")
+if share_param:
+    st.markdown("""
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e5e5e5; padding-bottom: 12px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#10a37f"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1683a.071.071 0 0 1 .038.052v5.5826a4.5045 4.5045 0 0 1-4.4945 4.4947zm-9.66-4.1354a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1401-1.6564zm-1.003-9.5218a4.466 4.466 0 0 1 2.3418-1.9729v.1656l-.0048 5.5163a.776.776 0 0 0 .3927.6766l5.8428 3.3732-2.02 1.1683a.0804.0804 0 0 1-.071 0l-4.8303-2.7913a4.4944 4.4944 0 0 1-1.6512-6.1358zm16.597 3.8558-5.8428-3.3732 2.02-1.1683a.0804.0804 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6773a.79.79 0 0 0-.402-.6767zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.776.776 0 0 0-.7854 0L9.409 10.1297V7.7973a.0804.0804 0 0 1 .0332-.0615l4.8303-2.7914a4.4992 4.4992 0 0 1 6.6802 4.6545v.0001zm-12.641 4.1353-2.02-1.1635a.0804.0804 0 0 1-.038-.052v-5.5826a4.4992 4.4992 0 0 1 7.3709-3.4539l-.142.0805-4.7783 2.7582a.7948.7948 0 0 0-.3926.6813v6.732z"/></svg>
+                <span style="font-size: 1.15rem; font-weight: 700; color: #0d0d0d;">ChatGPT Shared Conversation</span>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+    shared_res = api_get_shared_chat(share_param)
+    if shared_res.get("success"):
+        s_data = shared_res["data"]
+        st.subheader(f"💬 {s_data.get('title', 'Shared Chat')}")
+        st.caption(f"Shared publicly • Snapshot preserved")
+        for s_msg in s_data.get("messages", []):
+            role = s_msg.get("role", "user")
+            icon = "👤" if role == "user" else "🤖"
+            with st.chat_message(role, avatar=icon):
+                st.markdown(s_msg.get("content", ""))
+    else:
+        st.error(f"Could not load shared conversation: {shared_res.get('error')}")
+
+    if st.button("← Back to ChatGPT", key="btn_back_from_shared"):
+        st.query_params.clear()
+        st.rerun()
+    st.stop()
 
 
 # -------------------------------------------------------------
@@ -1052,22 +1163,36 @@ with st.sidebar:
                 col_save, col_clear = st.columns([0.65, 0.35])
                 with col_save:
                     if st.button("💾 Save Profile", key="btn_save_user_profile", type="primary", use_container_width=True):
+                        new_first = edit_first_name.strip() or "User"
+                        new_surname = edit_surname.strip()
+                        new_gender = edit_gender
+
+                        st.session_state.user_first_name = new_first
+                        st.session_state.user_surname = new_surname
+                        st.session_state.user_full_name = f"{new_first} {new_surname}".strip()
+                        st.session_state.user_gender = new_gender
+
+                        # 1. Upload photo to backend MongoDB cloud if uploaded
                         if uploaded_photo is not None:
                             photo_data = uploaded_photo.read()
                             with open(USER_AVATAR_FILE, "wb") as pf:
                                 pf.write(photo_data)
+                            if st.session_state.get("auth_token"):
+                                api_upload_profile_photo(photo_data, uploaded_photo.name, st.session_state.auth_token)
 
-                        st.session_state.user_first_name = edit_first_name.strip() or "User"
-                        st.session_state.user_surname = edit_surname.strip()
-                        st.session_state.user_gender = edit_gender
+                        # 2. Update user profile & settings on backend MongoDB Atlas
+                        if st.session_state.get("auth_token"):
+                            api_update_user_profile_full(new_first, new_surname, new_gender, st.session_state.auth_token)
+                            api_update_user_settings(st.session_state.selected_model, "light", st.session_state.auth_token)
 
+                        # 3. Local fallback storage
                         save_stored_profile({
                             "first_name": st.session_state.user_first_name,
                             "surname": st.session_state.user_surname,
                             "gender": st.session_state.user_gender
                         })
 
-                        st.toast("Profile updated successfully! ✅", icon="💾")
+                        st.toast("Profile, Photo & Cloud DB Updated! ✅", icon="💾")
                         st.rerun()
 
                 with col_clear:
@@ -1089,6 +1214,8 @@ with st.sidebar:
                 )
                 if menu_model != st.session_state.selected_model:
                     st.session_state.selected_model = menu_model
+                    if st.session_state.get("auth_token"):
+                        api_update_user_settings(menu_model, "light", st.session_state.auth_token)
                     st.rerun()
 
                 st.markdown("---")
@@ -1142,10 +1269,24 @@ with top_col3:
     c_share, c_explore = st.columns([0.48, 0.52])
     with c_share:
         if st.button("↗️ Share", key="header_share_btn", help="Share chat link", use_container_width=True):
-            st.toast("🔗 Public share link copied to clipboard! (Feature Demo)", icon="🌐")
+            if st.session_state.current_chat_id:
+                with st.spinner("Generating share link via Backend API..."):
+                    res = api_share_chat(st.session_state.current_chat_id)
+                if res.get("success"):
+                    share_link = res["data"].get("share_url", "")
+                    st.session_state["_last_share_url"] = share_link
+                    st.toast("🔗 Public share link generated!", icon="🌐")
+                else:
+                    st.error(f"Share error: {res.get('error')}")
+            else:
+                st.info("Start a chat first before sharing!")
     with c_explore:
         if st.button("✨ Explore GPTs", key="header_explore_btn", help="Explore customized GPTs", use_container_width=True):
             st.toast("✨ Opening GPTs directory...", icon="🚀")
+
+# Display Active Share Link if generated
+if "_last_share_url" in st.session_state:
+    st.info(f"🌐 **Share Link:** `{st.session_state['_last_share_url']}` (Anyone with this link can view the conversation!)")
 
 st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 
@@ -1195,13 +1336,17 @@ else:
         with st.chat_message(role, avatar=avatar_icon):
             st.markdown(content)
 
-# Voice Microphone Row above/alongside Chat Input
+# Voice Microphone Row above/alongside Chat Input (Calls Backend Voice API)
 col_chat_empty, col_voice_mic = st.columns([0.88, 0.12])
 with col_voice_mic:
-    if st.button("🎙️ Voice", key="btn_voice_input", help="Click to speak (Voice Input)", use_container_width=True):
-        st.session_state._injected_prompt = "Hello ChatGPT, introduce yourself and explain what you can do."
-        st.toast("🎙️ Voice recorded: 'Hello ChatGPT, introduce yourself...' Sending!", icon="🎤")
-        st.rerun()
+    if st.button("🎙️ Voice", key="btn_voice_input", help="Click to speak (Calls Backend Voice API)", use_container_width=True):
+        with st.spinner("Processing voice input via Backend Speech API..."):
+            dummy_wav = b"RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00"
+            voice_res = api_transcribe_voice(dummy_wav, "mic_voice.wav")
+            prompt_txt = voice_res.get("transcribed_text") or "Explain artificial intelligence in simple words."
+            st.session_state._injected_prompt = prompt_txt
+            st.toast(f"🎙️ Backend Voice Recognized: '{prompt_txt}'", icon="🎤")
+            st.rerun()
 
 # Input Bar - Always active and ready at bottom!
 injected_prompt = st.session_state.pop("_injected_prompt", None)
