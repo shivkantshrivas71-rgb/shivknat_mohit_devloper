@@ -84,3 +84,12 @@ class ResetPasswordRequest(BaseModel):
 class MessageResponse(BaseModel):
     message: str
     otp: Optional[str] = None
+
+# 12. Model for Google Authentication
+class GoogleAuthRequest(BaseModel):
+    email: EmailStr
+    name: Optional[str] = "Google User"
+    google_id: Optional[str] = None
+    avatar_url: Optional[str] = None
+
+
