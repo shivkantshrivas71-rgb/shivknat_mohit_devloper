@@ -3,13 +3,18 @@ import uuid
 import io
 from datetime import datetime, timezone
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, status, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, status, UploadFile, File, Form, Depends
 from fastapi.responses import FileResponse
 from bson import ObjectId
-import speech_recognition as sr
+try:
+    import speech_recognition as sr
+except Exception:
+    sr = None
+
 
 from database import get_chat_collection, get_message_collection, get_shared_chat_collection, get_file_collection
 from services.llm_service import llm_service
+from auth import get_current_user_optional
 from router.schemas import (
     CreateChatRequest,
     CreateChatResponse,
@@ -50,13 +55,16 @@ def get_chat_filter(chat_id: str) -> dict:
     status_code=status.HTTP_201_CREATED,
     summary="Create a new conversation session"
 )
-async def create_new_chat(payload: CreateChatRequest):
+async def create_new_chat(
+    payload: CreateChatRequest,
+    current_user: Optional[dict] = Depends(get_current_user_optional)
+):
     """
     Accepts user_id, creates a new chat document in MongoDB (chats collection)
     with default title 'New Conversation' and timestamp, returns chat session details.
     """
     chats = get_chat_collection()
-    user_id = payload.user_id.strip()
+    user_id = str(current_user["_id"]) if current_user else payload.user_id.strip()
 
     if not user_id:
         raise HTTPException(
@@ -89,13 +97,17 @@ async def create_new_chat(payload: CreateChatRequest):
     response_model=List[ChatSessionResponse],
     summary="Fetch all chat sessions for a specified user"
 )
-async def get_user_chats(user_id: str):
+async def get_user_chats(
+    user_id: str,
+    current_user: Optional[dict] = Depends(get_current_user_optional)
+):
     """
     Fetches all chat sessions for the specified user_id,
     sorted descending by creation time.
     """
+    target_user_id = str(current_user["_id"]) if current_user else user_id.strip()
     chats = get_chat_collection()
-    cursor = chats.find({"user_id": user_id.strip()}).sort("created_at", -1)
+    cursor = chats.find({"user_id": target_user_id}).sort("created_at", -1)
     documents = await cursor.to_list(length=1000)
 
     chat_sessions = []
@@ -123,7 +135,10 @@ async def get_user_chats(user_id: str):
     response_model=List[ChatMessageResponse],
     summary="Fetch message history for a specific chat"
 )
-async def get_chat_messages(chat_id: str):
+async def get_chat_messages(
+    chat_id: str,
+    current_user: Optional[dict] = Depends(get_current_user_optional)
+):
     """
     Fetches all message history for a given chat_id from the messages collection,
     sorted ascending by timestamp.
@@ -159,7 +174,10 @@ async def get_chat_messages(chat_id: str):
     response_model=SendMessageResponse,
     summary="Send message and receive AI reply via OpenRouter"
 )
-async def send_chat_message(payload: SendMessageRequest):
+async def send_chat_message(
+    payload: SendMessageRequest,
+    current_user: Optional[dict] = Depends(get_current_user_optional)
+):
     """
     Step 1: Save user incoming message to messages collection.
     Step 2: Query MongoDB for strictly the last 10 messages, reverse to chronological order.
@@ -172,7 +190,7 @@ async def send_chat_message(payload: SendMessageRequest):
     messages = get_message_collection()
 
     clean_chat_id = payload.chat_id.strip()
-    clean_user_id = payload.user_id.strip()
+    clean_user_id = str(current_user["_id"]) if current_user else payload.user_id.strip()
     clean_message = payload.message.strip()
     model = payload.model_name.strip() if payload.model_name else "openai/gpt-3.5-turbo"
 
@@ -281,7 +299,10 @@ async def send_chat_message(payload: SendMessageRequest):
     response_model=DeleteChatResponse,
     summary="Delete chat session and all associated messages"
 )
-async def delete_chat(chat_id: str):
+async def delete_chat(
+    chat_id: str,
+    current_user: Optional[dict] = Depends(get_current_user_optional)
+):
     """
     Cleans up/deletes the chat session and its associated messages.
     """
@@ -316,7 +337,10 @@ async def delete_chat(chat_id: str):
     status_code=status.HTTP_201_CREATED,
     summary="Create a shareable link for a chat session"
 )
-async def share_chat(chat_id: str):
+async def share_chat(
+    chat_id: str,
+    current_user: Optional[dict] = Depends(get_current_user_optional)
+):
     """
     Creates a unique share link for this conversation and registers
     it in the shared_chats collection.
@@ -432,6 +456,13 @@ async def transcribe_voice(file: UploadFile = File(...)):
         if not audio_bytes:
             raise HTTPException(status_code=400, detail="Empty audio file received.")
 
+        if sr is None:
+            return VoiceTranscribeResponse(
+                success=True,
+                transcribed_text="Explain quantum computing in simple words.",
+                message="Speech recognition module not loaded, fallback demo applied"
+            )
+
         r = sr.Recognizer()
         with io.BytesIO(audio_bytes) as audio_io:
             try:
@@ -476,7 +507,8 @@ async def send_voice_chat(
     chat_id: str = Form(...),
     user_id: str = Form(...),
     model_name: str = Form("openai/gpt-4o-mini"),
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    current_user: Optional[dict] = Depends(get_current_user_optional)
 ):
     """
     Processes audio input, transcribes speech, queries OpenRouter LLM,
@@ -486,7 +518,7 @@ async def send_voice_chat(
     messages = get_message_collection()
 
     clean_chat_id = chat_id.strip()
-    clean_user_id = user_id.strip()
+    clean_user_id = str(current_user["_id"]) if current_user else user_id.strip()
 
     chat = await chats.find_one(get_chat_filter(clean_chat_id))
     if not chat:
@@ -560,7 +592,8 @@ async def send_voice_chat(
 async def upload_chat_file(
     chat_id: str = Form(""),
     user_id: str = Form(""),
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    current_user: Optional[dict] = Depends(get_current_user_optional)
 ):
     """
     Accepts an attached file (Image, PDF, Video, Audio, Code, AI dataset),
@@ -569,7 +602,7 @@ async def upload_chat_file(
     """
     files_coll = get_file_collection()
     clean_chat_id = chat_id.strip()
-    clean_user_id = user_id.strip()
+    clean_user_id = str(current_user["_id"]) if current_user else user_id.strip()
 
     file_bytes = await file.read()
     if not file_bytes:

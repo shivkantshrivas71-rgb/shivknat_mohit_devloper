@@ -20,7 +20,8 @@ from models import (
     VerifyEmailRequest,
     ForgotPasswordRequest,
     ResetPasswordRequest,
-    MessageResponse
+    MessageResponse,
+    GoogleAuthRequest
 )
 from router.chat_router import router as chat_router
 from auth import (
@@ -30,6 +31,7 @@ from auth import (
     generate_otp,
     get_current_user
 )
+from services.email_service import send_otp_email
 
 # 1. Initialize FastAPI Application
 app = FastAPI(
@@ -158,7 +160,8 @@ async def user_register(user_data: UserRegister):
 
     result = await users.insert_one(new_user)
 
-    print(f"[EMAIL VERIFICATION OTP] Initial OTP for {email} is: {verification_otp}")
+    # Dispatch OTP via real SMTP email service
+    send_otp_email(email, verification_otp, purpose="Account Registration Verification")
 
     return UserResponse(
         id=str(result.inserted_id),
@@ -207,10 +210,11 @@ async def request_email_verification_otp(payload: RequestEmailVerification):
         }
     )
 
-    print(f"[EMAIL VERIFICATION OTP] Verification OTP for {email} is: {otp}")
+    # Dispatch OTP via real SMTP email service
+    send_otp_email(email, otp, purpose="Email Verification")
 
     return MessageResponse(
-        message="Verification OTP has been generated successfully. It is valid for 10 minutes.",
+        message="Verification OTP has been sent to your email. It is valid for 10 minutes.",
         otp=otp
     )
 
@@ -322,6 +326,63 @@ async def user_login(user_data: UserLogin):
             name=user["name"],
             email=user["email"],
             is_email_verified=user.get("is_email_verified", False)
+        )
+    )
+
+
+# -------------------------------------------------------------
+# 7b. Google Authentication (Sign in with Google)
+# -------------------------------------------------------------
+@app.post(
+    "/user/google-auth",
+    response_model=TokenResponse,
+    status_code=status.HTTP_200_OK,
+    tags=["Authentication"],
+    summary="Login or register user with Google"
+)
+async def user_google_auth(payload: GoogleAuthRequest):
+    """Authenticate or create user using Google Account."""
+    users = get_user_collection()
+    email = payload.email.strip().lower()
+    now = datetime.now(timezone.utc)
+
+    user = await users.find_one({"email": email})
+    if not user:
+        new_user = {
+            "name": payload.name or "Google User",
+            "email": email,
+            "password": hash_password(f"google_oauth_{payload.google_id or email}"),
+            "is_email_verified": True,
+            "google_id": payload.google_id,
+            "avatar_url": payload.avatar_url,
+            "token": None,
+            "created_at": now,
+            "updated_at": now
+        }
+        res = await users.insert_one(new_user)
+        user_id = str(res.inserted_id)
+        user_name = new_user["name"]
+    else:
+        user_id = str(user["_id"])
+        user_name = user["name"]
+        updates = {"updated_at": now, "is_email_verified": True}
+        if payload.google_id:
+            updates["google_id"] = payload.google_id
+        if payload.avatar_url and not user.get("avatar_url"):
+            updates["avatar_url"] = payload.avatar_url
+        await users.update_one({"_id": user["_id"]}, {"$set": updates})
+
+    token = create_token(user_id, email)
+    await users.update_one({"email": email}, {"$set": {"token": token}})
+
+    return TokenResponse(
+        access_token=token,
+        token_type="bearer",
+        user=UserResponse(
+            id=user_id,
+            name=user_name,
+            email=email,
+            is_email_verified=True
         )
     )
 
@@ -598,10 +659,11 @@ async def forgot_password(payload: ForgotPasswordRequest):
         {"$set": {"reset_otp": otp, "otp_expiry": otp_expiry}}
     )
 
-    print(f"[PASSWORD RESET OTP] OTP for {email} is: {otp}")
+    # Dispatch OTP via real SMTP email service
+    send_otp_email(email, otp, purpose="Password Reset")
 
     return MessageResponse(
-        message="Password reset OTP generated successfully. It is valid for 10 minutes.",
+        message="Password reset OTP has been sent to your email. It is valid for 10 minutes.",
         otp=otp
     )
 

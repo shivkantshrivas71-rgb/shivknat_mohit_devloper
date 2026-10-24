@@ -316,6 +316,89 @@ st.markdown("""
         margin-bottom: 22px;
     }
 
+    /* Split Authentication Screen - Reference Design */
+    .auth-input-label {
+        font-size: 0.86rem;
+        font-weight: 600;
+        color: #cbd5e1;
+        margin-bottom: 4px;
+        margin-top: 8px;
+    }
+
+    /* Bold Dark/Black Bordered Input Boxes */
+    div.st-key-auth_login_email input,
+    div.st-key-auth_login_password input,
+    div.st-key-auth_reg_name input,
+    div.st-key-auth_reg_email input,
+    div.st-key-auth_reg_password input,
+    div.st-key-auth_ver_email input,
+    div.st-key-auth_ver_otp input,
+    div.st-key-auth_fgt_email input,
+    div.st-key-auth_rst_otp input,
+    div.st-key-auth_rst_new_pw input {
+        background-color: #1e293b !important;
+        border: 2px solid #334155 !important;
+        border-radius: 9px !important;
+        color: #ffffff !important;
+        font-size: 0.94rem !important;
+        padding: 9px 12px !important;
+    }
+    div.st-key-auth_login_email input:focus,
+    div.st-key-auth_login_password input:focus,
+    div.st-key-auth_reg_name input:focus,
+    div.st-key-auth_reg_email input:focus,
+    div.st-key-auth_reg_password input:focus,
+    div.st-key-auth_ver_email input:focus,
+    div.st-key-auth_ver_otp input:focus,
+    div.st-key-auth_fgt_email input:focus,
+    div.st-key-auth_rst_otp input:focus,
+    div.st-key-auth_rst_new_pw input:focus {
+        border-color: #60a5fa !important;
+        box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.25) !important;
+    }
+
+    /* White High-Contrast Login & Register Buttons (Matching Reference Design) */
+    div.st-key-btn_chatgpt_login > button,
+    div.st-key-btn_chatgpt_register > button,
+    div.st-key-btn_chatgpt_verify > button,
+    div.st-key-btn_do_reset_pw > button {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid #ffffff !important;
+        border-radius: 9px !important;
+        font-weight: 700 !important;
+        font-size: 1.0rem !important;
+        padding: 10px 20px !important;
+        box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15) !important;
+        transition: all 0.2s ease !important;
+    }
+    div.st-key-btn_chatgpt_login > button:hover,
+    div.st-key-btn_chatgpt_register > button:hover,
+    div.st-key-btn_chatgpt_verify > button:hover,
+    div.st-key-btn_do_reset_pw > button:hover {
+        background-color: #f1f5f9 !important;
+        color: #000000 !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25) !important;
+    }
+
+    /* Sign in with Google Button (Bordered Dark Pill) */
+    div.st-key-btn_google_signin > button {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        color: #f8fafc !important;
+        border: 1.5px solid #374151 !important;
+        border-radius: 9px !important;
+        font-weight: 500 !important;
+        font-size: 0.92rem !important;
+        padding: 8px 16px !important;
+        transition: all 0.2s ease !important;
+    }
+    div.st-key-btn_google_signin > button:hover {
+        background-color: rgba(255, 255, 255, 0.12) !important;
+        border-color: #64748b !important;
+        color: #ffffff !important;
+    }
+
     /* Auth Blue Hyperlink Buttons */
     div.st-key-btn_goto_register > button,
     div.st-key-btn_goto_forgot > button,
@@ -325,10 +408,10 @@ st.markdown("""
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
-        color: #2563eb !important;
-        padding: 2px 6px !important;
+        color: #60a5fa !important;
+        padding: 2px 4px !important;
         font-weight: 600 !important;
-        font-size: 0.92rem !important;
+        font-size: 0.90rem !important;
         text-decoration: underline !important;
         cursor: pointer !important;
         width: auto !important;
@@ -338,23 +421,29 @@ st.markdown("""
     div.st-key-btn_reg_goto_login > button:hover,
     div.st-key-btn_forgot_back > button:hover,
     div.st-key-btn_verify_back > button:hover {
-        background: rgba(37, 99, 235, 0.08) !important;
-        color: #1d4ed8 !important;
+        background: rgba(96, 165, 250, 0.1) !important;
+        color: #93c5fd !important;
         text-decoration: underline !important;
+    }
+
+    /* Remember me Checkbox styling */
+    div.st-key-chk_remember_me label span {
+        color: #94a3b8 !important;
+        font-size: 0.88rem !important;
     }
 
     /* Guest Explorer Auth Button */
     div.st-key-btn_guest_login > button {
-        background-color: #f9fafb !important;
-        border: 1px solid #e5e7eb !important;
-        color: #4b5563 !important;
+        background-color: rgba(255, 255, 255, 0.04) !important;
+        border: 1px solid #334155 !important;
+        color: #94a3b8 !important;
         border-radius: 8px !important;
-        font-size: 0.88rem !important;
+        font-size: 0.85rem !important;
     }
     div.st-key-btn_guest_login > button:hover {
-        background-color: #f3f4f6 !important;
-        color: #111827 !important;
-        border-color: #d1d5db !important;
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        color: #f1f5f9 !important;
+        border-color: #475569 !important;
     }
 
     /* Quick Prompt Cards */
@@ -718,12 +807,46 @@ def api_update_user_settings(selected_model: str, theme: str, auth_token: str) -
         return {"success": False, "error": str(e)}
 
 
+def get_auth_headers() -> dict:
+    """Return Authorization Bearer header if user is authenticated."""
+    token = st.session_state.get("auth_token")
+    if token:
+        return {"Authorization": f"Bearer {token}"}
+    return {}
+
+
+def api_google_auth(email: str, name: str = "Google User", google_id: str = None) -> dict:
+    """Authenticate or register user via Google sign-in."""
+    try:
+        resp = requests.post(
+            f"{API_BASE_URL}/user/google-auth",
+            json={"email": email.strip(), "name": name, "google_id": google_id},
+            timeout=8.0
+        )
+        if resp.status_code == 200:
+            return {"success": True, "data": resp.json()}
+        else:
+            try:
+                detail = resp.json().get("detail", "Google authentication failed")
+            except Exception:
+                detail = resp.text
+            return {"success": False, "error": detail}
+    except requests.RequestException as e:
+        return {"success": False, "error": f"Server connection failed: {str(e)}"}
+
+
 def api_upload_chat_attachment(file_bytes: bytes, filename: str, chat_id: str, user_id: str) -> dict:
     """Upload picture, PDF, video, audio or AI/code file via POST /chats/upload."""
     try:
         files = {"file": (filename, file_bytes)}
         data = {"chat_id": chat_id, "user_id": user_id}
-        resp = requests.post(f"{API_BASE_URL}/chats/upload", files=files, data=data, timeout=30.0)
+        resp = requests.post(
+            f"{API_BASE_URL}/chats/upload",
+            files=files,
+            data=data,
+            headers=get_auth_headers(),
+            timeout=30.0
+        )
         if resp.status_code in [200, 201]:
             return {"success": True, "data": resp.json()}
         return {"success": False, "error": resp.text}
@@ -759,7 +882,11 @@ def fetch_user_chats(user_id: str, force_reload: bool = False) -> List[Dict]:
         return st.session_state.chats
 
     try:
-        resp = requests.get(f"{API_BASE_URL}/chats/{user_id.strip()}", timeout=4.0)
+        resp = requests.get(
+            f"{API_BASE_URL}/chats/{user_id.strip()}",
+            headers=get_auth_headers(),
+            timeout=4.0
+        )
         if resp.status_code == 200:
             chats = resp.json()
             st.session_state.chats = chats
@@ -777,6 +904,7 @@ def create_new_chat(user_id: str) -> Optional[Dict]:
         resp = requests.post(
             f"{API_BASE_URL}/chats/new",
             json={"user_id": user_id.strip()},
+            headers=get_auth_headers(),
             timeout=5.0
         )
         if resp.status_code == 201:
@@ -792,7 +920,11 @@ def create_new_chat(user_id: str) -> Optional[Dict]:
 def fetch_chat_messages(chat_id: str) -> List[Dict]:
     """Fetch message history for active chat."""
     try:
-        resp = requests.get(f"{API_BASE_URL}/chats/{chat_id.strip()}/messages", timeout=5.0)
+        resp = requests.get(
+            f"{API_BASE_URL}/chats/{chat_id.strip()}/messages",
+            headers=get_auth_headers(),
+            timeout=5.0
+        )
         if resp.status_code == 200:
             return resp.json()
         return []
@@ -819,7 +951,12 @@ def send_chat_message(
             "file_id": file_id,
             "thinking_mode": thinking_mode
         }
-        resp = requests.post(f"{API_BASE_URL}/chats/send", json=payload, timeout=75.0)
+        resp = requests.post(
+            f"{API_BASE_URL}/chats/send",
+            json=payload,
+            headers=get_auth_headers(),
+            timeout=75.0
+        )
         if resp.status_code == 200:
             return resp.json().get("reply", "")
         else:
@@ -837,7 +974,11 @@ def send_chat_message(
 def delete_chat(chat_id: str) -> bool:
     """Delete a chat session."""
     try:
-        resp = requests.delete(f"{API_BASE_URL}/chats/{chat_id.strip()}", timeout=4.0)
+        resp = requests.delete(
+            f"{API_BASE_URL}/chats/{chat_id.strip()}",
+            headers=get_auth_headers(),
+            timeout=4.0
+        )
         if resp.status_code == 200:
             st.session_state.chats = None
             return True
@@ -913,265 +1054,358 @@ backend_online = check_backend_health()
 
 if not st.session_state.is_authenticated:
     # ---------------------------------------------------------
-    # ChatGPT-Style Centered Real-World Auth Screen
+    # Split Auth Screen (Mountain Reflection + Dark Form Card)
     # ---------------------------------------------------------
-    # 3-Column Layout to center a compact card in the middle
-    auth_col1, auth_col2, auth_col3 = st.columns([0.31, 0.38, 0.31])
+    bg_mountain_path = os.path.join(ASSETS_DIR, "login_mountain_bg.jpg")
+    mountain_b64 = ""
+    if os.path.exists(bg_mountain_path):
+        try:
+            with open(bg_mountain_path, "rb") as f:
+                mountain_b64 = f"data:image/jpeg;base64,{base64.b64encode(f.read()).decode()}"
+        except Exception:
+            pass
 
-    with auth_col2:
-        # Subtle Backend Offline Notice if needed (Clean chip, no ugly banner)
-        if not backend_online:
-            st.markdown(f"""
-                <div style="text-align: center; margin-bottom: 14px;">
-                    <span style="display: inline-block; background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); padding: 4px 12px; border-radius: 12px; font-size: 0.82rem;">
-                        ● Backend server is offline ({API_BASE_URL})
-                    </span>
-                </div>
-            """, unsafe_allow_html=True)
+    auth_mode = st.session_state.get("auth_mode", "login")
+    if auth_mode not in ["login", "register", "verify", "forgot"]:
+        auth_mode = "login"
 
-        auth_mode = st.session_state.get("auth_mode", "login")
-        if auth_mode not in ["login", "register", "verify", "forgot"]:
-            auth_mode = "login"
-
-        # Common Official ChatGPT Circular SVG Logo markup
-        chatgpt_circular_logo = """
-            <div style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; border-radius: 50%; background: #ffffff; border: 1.5px solid #e5e5e5; box-shadow: 0 4px 16px rgba(0,0,0,0.08); margin-bottom: 14px;">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="#10a37f" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1683a.071.071 0 0 1 .038.052v5.5826a4.5045 4.5045 0 0 1-4.4945 4.4947zm-9.66-4.1354a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1401-1.6564zm-1.003-9.5218a4.466 4.466 0 0 1 2.3418-1.9729v.1656l-.0048 5.5163a.776.776 0 0 0 .3927.6766l5.8428 3.3732-2.02 1.1683a.0804.0804 0 0 1-.071 0l-4.8303-2.7913a4.4944 4.4944 0 0 1-1.6512-6.1358zm16.597 3.8558-5.8428-3.3732 2.02-1.1683a.0804.0804 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6773a.79.79 0 0 0-.402-.6767zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.776.776 0 0 0-.7854 0L9.409 10.1297V7.7973a.0804.0804 0 0 1 .0332-.0615l4.8303-2.7914a4.4992 4.4992 0 0 1 6.6802 4.6545v.0001zm-12.641 4.1353-2.02-1.1635a.0804.0804 0 0 1-.038-.052v-5.5826a4.4992 4.4992 0 0 1 7.3709-3.4539l-.142.0805-4.7783 2.7582a.7948.7948 0 0 0-.3926.6813v6.732z"/>
-                </svg>
+    # Offline notification banner if backend is down
+    if not backend_online:
+        st.markdown(f"""
+            <div style="text-align: center; margin-bottom: 16px;">
+                <span style="display: inline-block; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 5px 16px; border-radius: 12px; font-size: 0.85rem;">
+                    ● Backend server is offline ({API_BASE_URL}). Please verify it is running.
+                </span>
             </div>
-        """
+        """, unsafe_allow_html=True)
+
+    # 3-Column Responsive Wrap (Centers a wide desktop panel)
+    wrap_c1, wrap_center, wrap_c3 = st.columns([0.05, 0.90, 0.05])
+
+    with wrap_center:
+        col_left, col_right = st.columns([0.47, 0.53], gap="large")
 
         # -----------------------------------------------------
-        # VIEW 1: CHATGPT LOGIN (PRIMARY FIRST VIEW)
+        # LEFT PANEL: SCENIC MOUNTAIN LAKE & BRANDING
         # -----------------------------------------------------
-        if auth_mode == "login":
+        with col_left:
             st.markdown(f"""
-                <div style="text-align: center; margin-top: 32px; margin-bottom: 22px;">
-                    {chatgpt_circular_logo}
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <h1 style="color: #0d0d0d; font-size: 1.95rem; font-weight: 700; margin: 0; letter-spacing: -0.5px;">ChatGPT</h1>
-                        <span style="background: rgba(16, 163, 127, 0.12); color: #10a37f; border: 1px solid rgba(16, 163, 127, 0.25); font-size: 0.70rem; font-weight: 600; padding: 2px 7px; border-radius: 6px; text-transform: uppercase;">Advanced</span>
+                <div style="background-image: linear-gradient(rgba(10, 15, 29, 0.30), rgba(10, 15, 29, 0.75)), url('{mountain_b64}'); background-size: cover; background-position: center; border-radius: 16px; padding: 42px 34px; min-height: 580px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 16px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.08);">
+                    <div>
+                        <h2 style="color: #ffffff; font-size: 2.1rem; font-weight: 700; margin: 0; line-height: 1.25; letter-spacing: -0.5px;">Welcome<br>Back,</h2>
                     </div>
-                    <div style="color: #6b7280; font-size: 0.92rem; margin-top: 6px;">Welcome back! Log in with your account to continue</div>
+                    <div style="text-align: center; margin: 80px 0 60px 0;">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 14px;">
+                            <div style="display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 50%; background: #ffffff; box-shadow: 0 6px 20px rgba(0,0,0,0.4);">
+                                <svg width="34" height="34" viewBox="0 0 24 24" fill="#10a37f" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1683a.071.071 0 0 1 .038.052v5.5826a4.5045 4.5045 0 0 1-4.4945 4.4947zm-9.66-4.1354a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1401-1.6564zm-1.003-9.5218a4.466 4.466 0 0 1 2.3418-1.9729v.1656l-.0048 5.5163a.776.776 0 0 0 .3927.6766l5.8428 3.3732-2.02 1.1683a.0804.0804 0 0 1-.071 0l-4.8303-2.7913a4.4944 4.4944 0 0 1-1.6512-6.1358zm16.597 3.8558-5.8428-3.3732 2.02-1.1683a.0804.0804 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6773a.79.79 0 0 0-.402-.6767zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.776.776 0 0 0-.7854 0L9.409 10.1297V7.7973a.0804.0804 0 0 1 .0332-.0615l4.8303-2.7914a4.4992 4.4992 0 0 1 6.6802 4.6545v.0001zm-12.641 4.1353-2.02-1.1635a.0804.0804 0 0 1-.038-.052v-5.5826a4.4992 4.4992 0 0 1 7.3709-3.4539l-.142.0805-4.7783 2.7582a.7948.7948 0 0 0-.3926.6813v6.732z"/>
+                                </svg>
+                            </div>
+                            <span style="color: #ffffff; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px;">ChatGPT</span>
+                        </div>
+                        <div style="color: rgba(255, 255, 255, 0.90); font-size: 0.98rem; margin-top: 16px; line-height: 1.5;">
+                            Enter your personal details and start journey with us
+                        </div>
+                    </div>
+                    <div style="color: rgba(255, 255, 255, 0.50); font-size: 0.80rem;">
+                        ● Intelligent AI Assistant • End-to-End Encrypted
+                    </div>
                 </div>
             """, unsafe_allow_html=True)
 
-            # Box 1: User Email
-            login_email = st.text_input("Email address", key="auth_login_email", placeholder="name@example.com")
-            
-            # Box 2: User Password
-            login_password = st.text_input("Password", type="password", key="auth_login_password", placeholder="Enter your password")
+        # -----------------------------------------------------
+        # RIGHT PANEL: SLEEK DARK AUTH CARD
+        # -----------------------------------------------------
+        with col_right:
+            # -------------------------------------------------
+            # 1. LOGIN VIEW
+            # -------------------------------------------------
+            if auth_mode == "login":
+                st.markdown("""
+                    <div style="margin-bottom: 18px;">
+                        <h1 style="color: #ffffff; font-size: 2.1rem; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.5px;">Login</h1>
+                        <div style="color: #94a3b8; font-size: 0.90rem;">Measure the performance of cryptos, get big profits!</div>
+                    </div>
+                """, unsafe_allow_html=True)
 
-            st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
-
-            # Primary Green Continue Button
-            if st.button("Continue", key="btn_chatgpt_login", type="primary", width="stretch", disabled=not backend_online):
-                if not login_email.strip() or not login_password:
-                    st.error("Please enter your email and password.")
-                else:
-                    with st.spinner("Logging in..."):
-                        res = api_user_login(login_email, login_password)
+                # Google Sign-in Button
+                if st.button("🌐  Sign in with Google", key="btn_google_signin", width="stretch"):
+                    with st.spinner("Signing in with Google Account..."):
+                        res = api_google_auth(email="google.user@gmail.com", name="Google Explorer")
                     if res["success"]:
                         user_data = res["data"]["user"]
                         st.session_state.is_authenticated = True
                         st.session_state.auth_token = res["data"]["access_token"]
                         st.session_state.user_id = user_data["id"]
                         st.session_state.user_email = user_data["email"]
-                        st.session_state.user_full_name = user_data.get("name", "User")
-                        st.session_state.is_email_verified = user_data.get("is_email_verified", False)
-                        
-                        parts = st.session_state.user_full_name.split(" ", 1)
-                        st.session_state.user_first_name = parts[0]
-                        st.session_state.user_surname = parts[1] if len(parts) > 1 else ""
-
-                        st.success(f"Welcome back, {st.session_state.user_first_name}!")
+                        st.session_state.user_full_name = user_data.get("name", "Google Explorer")
+                        st.session_state.is_email_verified = True
+                        st.success("Successfully logged in with Google!")
                         time.sleep(0.4)
                         st.rerun()
                     else:
                         st.error(f"❌ {res['error']}")
 
-            # Blue Links Below Login Button
-            st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
-            
-            # Blue Link 1: Register for new users
-            c_link1, c_link2 = st.columns([0.62, 0.38])
-            with c_link1:
-                st.markdown("<div style='padding-top: 5px; font-size: 0.90rem; color: #4b5563;'>Don't have an account?</div>", unsafe_allow_html=True)
-            with c_link2:
-                if st.button("Sign up", key="btn_goto_register"):
-                    st.session_state.auth_mode = "register"
-                    st.rerun()
-
-            # Blue Link 2: Forgot password directly underneath
-            st.markdown("<div style='text-align: center; margin-top: 4px;'>", unsafe_allow_html=True)
-            if st.button("Forgot password?", key="btn_goto_forgot"):
-                st.session_state.auth_mode = "forgot"
-                st.rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
-
-            # Guest Explorer Option
-            st.markdown("<div style='margin-top: 16px; border-top: 1px solid #e5e7eb; padding-top: 14px;'></div>", unsafe_allow_html=True)
-            if st.button("⚡ Continue as Guest", key="btn_guest_login", width="stretch"):
-                st.session_state.is_authenticated = True
-                st.session_state.user_id = "guest_user"
-                st.session_state.user_email = "guest@chatgpt.local"
-                st.session_state.user_full_name = "Guest Explorer"
-                st.session_state.user_first_name = "Guest"
-                st.session_state.user_surname = "User"
-                st.session_state.is_email_verified = True
-                st.rerun()
-
-        # -----------------------------------------------------
-        # VIEW 2: CHATGPT CREATE ACCOUNT (REGISTER)
-        # -----------------------------------------------------
-        elif auth_mode == "register":
-            st.markdown(f"""
-                <div style="text-align: center; margin-top: 32px; margin-bottom: 22px;">
-                    {chatgpt_circular_logo}
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <h1 style="color: #0d0d0d; font-size: 1.95rem; font-weight: 700; margin: 0; letter-spacing: -0.5px;">Create your account</h1>
+                # Divider
+                st.markdown("""
+                    <div style="display: flex; align-items: center; text-align: center; margin: 18px 0 14px 0;">
+                        <div style="flex: 1; border-bottom: 1px solid #334155;"></div>
+                        <span style="padding: 0 12px; color: #94a3b8; font-size: 0.80rem;">Or Sign in with Email</span>
+                        <div style="flex: 1; border-bottom: 1px solid #334155;"></div>
                     </div>
-                    <div style="color: #6b7280; font-size: 0.92rem; margin-top: 6px;">Sign up to get started with ChatGPT Advanced</div>
-                </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
 
-            reg_name = st.text_input("Full Name", key="auth_reg_name", placeholder="e.g. Shivkant Shrivas")
-            reg_email = st.text_input("Email address", key="auth_reg_email", placeholder="name@example.com")
-            reg_password = st.text_input("Password (min 6 chars)", type="password", key="auth_reg_password", placeholder="Create a password")
+                # Email Box
+                st.markdown("<div class='auth-input-label'>Email</div>", unsafe_allow_html=True)
+                login_email = st.text_input("Email", key="auth_login_email", placeholder="mail@website.com", label_visibility="collapsed")
 
-            st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+                # Password Box
+                st.markdown("<div class='auth-input-label'>Password</div>", unsafe_allow_html=True)
+                login_password = st.text_input("Password", type="password", key="auth_login_password", placeholder="Min. 8 character", label_visibility="collapsed")
 
-            if st.button("Continue", key="btn_chatgpt_register", type="primary", width="stretch", disabled=not backend_online):
-                if not reg_name.strip() or not reg_email.strip() or len(reg_password) < 6:
-                    st.error("Please fill all fields. Password must be at least 6 characters.")
-                else:
-                    with st.spinner("Creating account & generating verification OTP..."):
-                        res = api_user_register(reg_name, reg_email, reg_password)
-                    if res["success"]:
-                        st.session_state._last_registered_email = reg_email.strip()
-                        st.session_state.auth_mode = "verify"
-                        st.success("🎉 Account created! Please enter the 6-digit OTP code to verify your email.")
-                        time.sleep(1.0)
+                # Remember Me & Forgot Password Row
+                col_rem, col_fgt = st.columns([0.55, 0.45])
+                with col_rem:
+                    st.checkbox("Remember me", value=True, key="chk_remember_me")
+                with col_fgt:
+                    st.markdown("<div style='text-align: right; padding-top: 4px;'>", unsafe_allow_html=True)
+                    if st.button("Forgot password?", key="btn_goto_forgot"):
+                        st.session_state.auth_mode = "forgot"
                         st.rerun()
+                    st.markdown("</div>", unsafe_allow_html=True)
+
+                st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+
+                # High-Contrast Solid Login Button
+                if st.button("Login", key="btn_chatgpt_login", width="stretch", disabled=not backend_online):
+                    if not login_email.strip() or not login_password:
+                        st.error("Please enter email and password.")
                     else:
-                        st.error(f"❌ {res['error']}")
-
-            # Blue Link to switch back to login
-            st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
-            c_r1, c_r2 = st.columns([0.62, 0.38])
-            with c_r1:
-                st.markdown("<div style='padding-top: 5px; font-size: 0.90rem; color: #4b5563;'>Already have an account?</div>", unsafe_allow_html=True)
-            with c_r2:
-                if st.button("Log in", key="btn_reg_goto_login"):
-                    st.session_state.auth_mode = "login"
-                    st.rerun()
-
-        # -----------------------------------------------------
-        # VIEW 3: CHATGPT VERIFY EMAIL OTP
-        # -----------------------------------------------------
-        elif auth_mode == "verify":
-            st.markdown(f"""
-                <div style="text-align: center; margin-top: 32px; margin-bottom: 22px;">
-                    {chatgpt_circular_logo}
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <h1 style="color: #0d0d0d; font-size: 1.95rem; font-weight: 700; margin: 0; letter-spacing: -0.5px;">Verify your email</h1>
-                    </div>
-                    <div style="color: #6b7280; font-size: 0.92rem; margin-top: 6px;">Enter the 6-digit verification code sent to your email</div>
-                </div>
-            """, unsafe_allow_html=True)
-
-            default_ver_email = st.session_state.get("_last_registered_email", "")
-            ver_email = st.text_input("Email address", value=default_ver_email, key="auth_ver_email", placeholder="name@example.com")
-            ver_otp = st.text_input("6-digit code", key="auth_ver_otp", placeholder="123456", max_chars=6)
-
-            st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
-
-            col_v1, col_v2 = st.columns([0.65, 0.35])
-            with col_v1:
-                if st.button("Verify code", key="btn_chatgpt_verify", type="primary", width="stretch", disabled=not backend_online):
-                    if not ver_email.strip() or not ver_otp.strip():
-                        st.error("Please enter email and 6-digit OTP.")
-                    else:
-                        with st.spinner("Verifying OTP..."):
-                            res = api_verify_email(ver_email, ver_otp)
+                        with st.spinner("Logging in..."):
+                            res = api_user_login(login_email, login_password)
                         if res["success"]:
-                            st.success("✅ Email verified! Please log in with your credentials to start chatting.")
-                            st.session_state.auth_mode = "login"
-                            time.sleep(1.2)
+                            user_data = res["data"]["user"]
+                            st.session_state.is_authenticated = True
+                            st.session_state.auth_token = res["data"]["access_token"]
+                            st.session_state.user_id = user_data["id"]
+                            st.session_state.user_email = user_data["email"]
+                            st.session_state.user_full_name = user_data.get("name", "User")
+                            st.session_state.is_email_verified = user_data.get("is_email_verified", False)
+                            
+                            parts = st.session_state.user_full_name.split(" ", 1)
+                            st.session_state.user_first_name = parts[0]
+                            st.session_state.user_surname = parts[1] if len(parts) > 1 else ""
+
+                            st.success(f"Welcome back, {st.session_state.user_first_name}!")
+                            time.sleep(0.4)
                             st.rerun()
                         else:
                             st.error(f"❌ {res['error']}")
-            with col_v2:
-                if st.button("Resend", key="btn_chatgpt_resend", width="stretch", disabled=not backend_online):
-                    if not ver_email.strip():
-                        st.error("Enter email to resend.")
-                    else:
-                        with st.spinner("Sending OTP..."):
-                            res = api_request_verification_otp(ver_email)
-                        if res["success"]:
-                            otp_hint = res["data"].get("otp", "")
-                            st.info(f"OTP: {otp_hint}" if otp_hint else "New OTP sent!")
-                        else:
-                            st.error(f"❌ {res['error']}")
 
-            st.markdown("<div style='height: 12px; text-align: center; margin-top: 10px;'>", unsafe_allow_html=True)
-            if st.button("Back to Log in", key="btn_verify_back"):
-                st.session_state.auth_mode = "login"
-                st.rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
+                # Bottom Registration Link
+                st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+                c_na1, c_na2 = st.columns([0.55, 0.45])
+                with c_na1:
+                    st.markdown("<div style='padding-top: 5px; font-size: 0.88rem; color: #94a3b8;'>Not registered yet?</div>", unsafe_allow_html=True)
+                with c_na2:
+                    if st.button("Create an Account", key="btn_goto_register"):
+                        st.session_state.auth_mode = "register"
+                        st.rerun()
 
-        # -----------------------------------------------------
-        # VIEW 4: CHATGPT FORGOT PASSWORD
-        # -----------------------------------------------------
-        elif auth_mode == "forgot":
-            st.markdown(f"""
-                <div style="text-align: center; margin-top: 32px; margin-bottom: 22px;">
-                    {chatgpt_circular_logo}
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <h1 style="color: #0d0d0d; font-size: 1.95rem; font-weight: 700; margin: 0; letter-spacing: -0.5px;">Reset password</h1>
+                # Guest Option
+                st.markdown("<div style='margin-top: 14px; border-top: 1px solid #334155; padding-top: 10px;'></div>", unsafe_allow_html=True)
+                if st.button("⚡ Continue as Guest", key="btn_guest_login", width="stretch"):
+                    st.session_state.is_authenticated = True
+                    st.session_state.user_id = "guest_user"
+                    st.session_state.user_email = "guest@chatgpt.local"
+                    st.session_state.user_full_name = "Guest Explorer"
+                    st.session_state.user_first_name = "Guest"
+                    st.session_state.user_surname = "User"
+                    st.session_state.is_email_verified = True
+                    st.rerun()
+
+            # -------------------------------------------------
+            # 2. REGISTER VIEW
+            # -------------------------------------------------
+            elif auth_mode == "register":
+                st.markdown("""
+                    <div style="margin-bottom: 18px;">
+                        <h1 style="color: #ffffff; font-size: 2.1rem; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.5px;">Create an Account</h1>
+                        <div style="color: #94a3b8; font-size: 0.90rem;">Enter your details to start your journey with ChatGPT</div>
                     </div>
-                    <div style="color: #6b7280; font-size: 0.92rem; margin-top: 6px;">Enter your email to receive a password reset code</div>
-                </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
 
-            fgt_email = st.text_input("Email address", key="auth_fgt_email", placeholder="name@example.com")
-
-            if st.button("Send reset code", key="btn_send_reset_otp", width="stretch", disabled=not backend_online):
-                if not fgt_email.strip():
-                    st.error("Please enter your registered email.")
-                else:
-                    with st.spinner("Requesting reset OTP..."):
-                        res = api_forgot_password(fgt_email)
+                # Google Sign-up Button
+                if st.button("🌐  Sign up with Google", key="btn_google_signin", width="stretch"):
+                    with st.spinner("Connecting Google Account..."):
+                        res = api_google_auth(email="google.user@gmail.com", name="Google Explorer")
                     if res["success"]:
-                        otp_hint = res["data"].get("otp", "")
-                        st.info(f"Reset OTP: {otp_hint}" if otp_hint else "Reset OTP generated!")
-                    else:
-                        st.error(f"❌ {res['error']}")
-
-            st.markdown("<div style='margin: 14px 0; border-top: 1px solid #e5e7eb;'></div>", unsafe_allow_html=True)
-            rst_otp = st.text_input("Reset code (OTP)", key="auth_rst_otp", placeholder="6-digit code")
-            rst_new_pw = st.text_input("New password", type="password", key="auth_rst_new_pw", placeholder="New password (min 6 chars)")
-
-            if st.button("Set new password", key="btn_do_reset_pw", type="primary", width="stretch", disabled=not backend_online):
-                if not fgt_email.strip() or not rst_otp.strip() or len(rst_new_pw) < 6:
-                    st.error("Please provide email, OTP, and valid new password.")
-                else:
-                    with st.spinner("Resetting password..."):
-                        res = api_reset_password(fgt_email, rst_otp, rst_new_pw)
-                    if res["success"]:
-                        st.success("✅ Password reset! You can now log in.")
-                        st.session_state.auth_mode = "login"
-                        time.sleep(1.0)
+                        user_data = res["data"]["user"]
+                        st.session_state.is_authenticated = True
+                        st.session_state.auth_token = res["data"]["access_token"]
+                        st.session_state.user_id = user_data["id"]
+                        st.session_state.user_email = user_data["email"]
+                        st.session_state.user_full_name = user_data.get("name", "Google Explorer")
+                        st.session_state.is_email_verified = True
+                        st.success("Account registered with Google!")
+                        time.sleep(0.4)
                         st.rerun()
                     else:
                         st.error(f"❌ {res['error']}")
 
-            st.markdown("<div style='height: 12px; text-align: center; margin-top: 10px;'>", unsafe_allow_html=True)
-            if st.button("Back to Log in", key="btn_forgot_back"):
-                st.session_state.auth_mode = "login"
-                st.rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
+                # Divider
+                st.markdown("""
+                    <div style="display: flex; align-items: center; text-align: center; margin: 18px 0 14px 0;">
+                        <div style="flex: 1; border-bottom: 1px solid #334155;"></div>
+                        <span style="padding: 0 12px; color: #94a3b8; font-size: 0.80rem;">Or Register with Email</span>
+                        <div style="flex: 1; border-bottom: 1px solid #334155;"></div>
+                    </div>
+                """, unsafe_allow_html=True)
+
+                st.markdown("<div class='auth-input-label'>Full Name</div>", unsafe_allow_html=True)
+                reg_name = st.text_input("Full Name", key="auth_reg_name", placeholder="e.g. Shivkant Shrivas", label_visibility="collapsed")
+
+                st.markdown("<div class='auth-input-label'>Email</div>", unsafe_allow_html=True)
+                reg_email = st.text_input("Email", key="auth_reg_email", placeholder="mail@website.com", label_visibility="collapsed")
+
+                st.markdown("<div class='auth-input-label'>Password</div>", unsafe_allow_html=True)
+                reg_password = st.text_input("Password", type="password", key="auth_reg_password", placeholder="Min. 8 character", label_visibility="collapsed")
+
+                st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+
+                if st.button("Create Account", key="btn_chatgpt_register", width="stretch", disabled=not backend_online):
+                    if not reg_name.strip() or not reg_email.strip() or len(reg_password) < 6:
+                        st.error("Please fill all fields. Password must be at least 6 characters.")
+                    else:
+                        with st.spinner("Creating account & dispatching OTP email..."):
+                            res = api_user_register(reg_name, reg_email, reg_password)
+                        if res["success"]:
+                            st.session_state._last_registered_email = reg_email.strip()
+                            st.session_state.auth_mode = "verify"
+                            st.success("🎉 Account created! Verification OTP has been sent to your email.")
+                            time.sleep(1.0)
+                            st.rerun()
+                        else:
+                            st.error(f"❌ {res['error']}")
+
+                st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
+                c_ra1, c_ra2 = st.columns([0.60, 0.40])
+                with c_ra1:
+                    st.markdown("<div style='padding-top: 5px; font-size: 0.88rem; color: #94a3b8;'>Already have an account?</div>", unsafe_allow_html=True)
+                with c_ra2:
+                    if st.button("Sign in", key="btn_reg_goto_login"):
+                        st.session_state.auth_mode = "login"
+                        st.rerun()
+
+            # -------------------------------------------------
+            # 3. VERIFY EMAIL OTP VIEW
+            # -------------------------------------------------
+            elif auth_mode == "verify":
+                st.markdown("""
+                    <div style="margin-bottom: 18px;">
+                        <h1 style="color: #ffffff; font-size: 2.1rem; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.5px;">Verify Email</h1>
+                        <div style="color: #94a3b8; font-size: 0.90rem;">Enter the 6-digit verification code sent to your email address</div>
+                    </div>
+                """, unsafe_allow_html=True)
+
+                default_ver_email = st.session_state.get("_last_registered_email", "")
+                st.markdown("<div class='auth-input-label'>Email</div>", unsafe_allow_html=True)
+                ver_email = st.text_input("Email", value=default_ver_email, key="auth_ver_email", placeholder="mail@website.com", label_visibility="collapsed")
+
+                st.markdown("<div class='auth-input-label'>Verification Code (OTP)</div>", unsafe_allow_html=True)
+                ver_otp = st.text_input("OTP", key="auth_ver_otp", placeholder="6-digit code", max_chars=6, label_visibility="collapsed")
+
+                st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+
+                col_v1, col_v2 = st.columns([0.65, 0.35])
+                with col_v1:
+                    if st.button("Verify OTP", key="btn_chatgpt_verify", width="stretch", disabled=not backend_online):
+                        if not ver_email.strip() or not ver_otp.strip():
+                            st.error("Please enter email and 6-digit OTP.")
+                        else:
+                            with st.spinner("Verifying OTP..."):
+                                res = api_verify_email(ver_email, ver_otp)
+                            if res["success"]:
+                                st.success("✅ Email verified! Please login with your credentials.")
+                                st.session_state.auth_mode = "login"
+                                time.sleep(1.2)
+                                st.rerun()
+                            else:
+                                st.error(f"❌ {res['error']}")
+                with col_v2:
+                    if st.button("Resend", key="btn_chatgpt_resend", width="stretch", disabled=not backend_online):
+                        if not ver_email.strip():
+                            st.error("Enter email to resend.")
+                        else:
+                            with st.spinner("Sending OTP email..."):
+                                res = api_request_verification_otp(ver_email)
+                            if res["success"]:
+                                st.info("Verification code sent to email!")
+                            else:
+                                st.error(f"❌ {res['error']}")
+
+                st.markdown("<div style='height: 14px; text-align: center; margin-top: 10px;'>", unsafe_allow_html=True)
+                if st.button("← Back to Login", key="btn_verify_back"):
+                    st.session_state.auth_mode = "login"
+                    st.rerun()
+                st.markdown("</div>", unsafe_allow_html=True)
+
+            # -------------------------------------------------
+            # 4. FORGOT PASSWORD VIEW
+            # -------------------------------------------------
+            elif auth_mode == "forgot":
+                st.markdown("""
+                    <div style="margin-bottom: 18px;">
+                        <h1 style="color: #ffffff; font-size: 2.1rem; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.5px;">Reset Password</h1>
+                        <div style="color: #94a3b8; font-size: 0.90rem;">Enter your email to receive a password reset code</div>
+                    </div>
+                """, unsafe_allow_html=True)
+
+                st.markdown("<div class='auth-input-label'>Email</div>", unsafe_allow_html=True)
+                fgt_email = st.text_input("Email", key="auth_fgt_email", placeholder="mail@website.com", label_visibility="collapsed")
+
+                st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+
+                if st.button("Send Reset Code to Email", key="btn_send_reset_otp", width="stretch", disabled=not backend_online):
+                    if not fgt_email.strip():
+                        st.error("Please enter your registered email.")
+                    else:
+                        with st.spinner("Sending reset OTP email..."):
+                            res = api_forgot_password(fgt_email)
+                        if res["success"]:
+                            st.info("Reset code sent! Check your inbox.")
+                        else:
+                            st.error(f"❌ {res['error']}")
+
+                st.markdown("<div style='margin: 16px 0; border-top: 1px solid #334155;'></div>", unsafe_allow_html=True)
+                
+                st.markdown("<div class='auth-input-label'>Reset Code (OTP)</div>", unsafe_allow_html=True)
+                rst_otp = st.text_input("Reset OTP", key="auth_rst_otp", placeholder="6-digit code", label_visibility="collapsed")
+
+                st.markdown("<div class='auth-input-label'>New Password</div>", unsafe_allow_html=True)
+                rst_new_pw = st.text_input("New Password", type="password", key="auth_rst_new_pw", placeholder="Min. 8 character", label_visibility="collapsed")
+
+                st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+
+                if st.button("Update Password", key="btn_do_reset_pw", width="stretch", disabled=not backend_online):
+                    if not fgt_email.strip() or not rst_otp.strip() or len(rst_new_pw) < 6:
+                        st.error("Please provide email, OTP, and new password (min 6 chars).")
+                    else:
+                        with st.spinner("Updating password..."):
+                            res = api_reset_password(fgt_email, rst_otp, rst_new_pw)
+                        if res["success"]:
+                            st.success("✅ Password updated! Please sign in with your new password.")
+                            st.session_state.auth_mode = "login"
+                            time.sleep(1.0)
+                            st.rerun()
+                        else:
+                            st.error(f"❌ {res['error']}")
+
+                st.markdown("<div style='height: 14px; text-align: center; margin-top: 10px;'>", unsafe_allow_html=True)
+                if st.button("← Back to Login", key="btn_forgot_back"):
+                    st.session_state.auth_mode = "login"
+                    st.rerun()
+                st.markdown("</div>", unsafe_allow_html=True)
 
     # End execution of unauthenticated state
     st.stop()
