@@ -558,8 +558,8 @@ async def send_voice_chat(
     summary="Upload pictures, PDFs, videos, or AI/code files"
 )
 async def upload_chat_file(
-    chat_id: str = Form(...),
-    user_id: str = Form(...),
+    chat_id: str = Form(""),
+    user_id: str = Form(""),
     file: UploadFile = File(...)
 ):
     """
