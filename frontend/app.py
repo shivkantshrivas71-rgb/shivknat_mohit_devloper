@@ -198,6 +198,87 @@ st.markdown("""
         background: transparent !important;
     }
 
+    /* Try GPT-6 Pill Button Styling */
+    div.st-key-btn_try_gpt6 > button {
+        background-color: #f3f4f6 !important;
+        color: #111827 !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 9999px !important;
+        padding: 8px 24px !important;
+        font-weight: 500 !important;
+        font-size: 0.95rem !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+        transition: all 0.2s ease !important;
+    }
+    div.st-key-btn_try_gpt6 > button:hover {
+        background-color: #e5e7eb !important;
+        border-color: #d1d5db !important;
+        transform: translateY(-1px) !important;
+    }
+
+    /* Blue Circular Advanced Voice Mode Button */
+    div.st-key-btn_advanced_voice > button {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+        border-radius: 50% !important;
+        border: none !important;
+        height: 42px !important;
+        width: 42px !important;
+        min-width: 42px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45) !important;
+        font-size: 1.15rem !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        transition: transform 0.15s ease, background-color 0.15s ease !important;
+    }
+    div.st-key-btn_advanced_voice > button:hover {
+        background-color: #1d4ed8 !important;
+        transform: scale(1.08) !important;
+    }
+
+    /* Microphone Button */
+    div.st-key-btn_mic_speech > button {
+        border-radius: 50% !important;
+        height: 42px !important;
+        width: 42px !important;
+        min-width: 42px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        border: 1px solid #e5e7eb !important;
+    }
+
+    /* Plus Attachment Button */
+    div[data-testid="stPopover"]:has(.plus-popover-tag) > button,
+    div.st-key-plus_attach_popover > button {
+        border-radius: 50% !important;
+        height: 42px !important;
+        width: 42px !important;
+        min-width: 42px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        border: 1px solid #e5e7eb !important;
+        background-color: #ffffff !important;
+        padding: 0 !important;
+    }
+
+    /* Think Button */
+    div.st-key-btn_toggle_thinking > button {
+        border-radius: 20px !important;
+        padding: 6px 14px !important;
+        font-weight: 600 !important;
+        font-size: 0.88rem !important;
+        border: 1px solid #d1d5db !important;
+    }
+
     /* ChatGPT Auth Screen Styling in Light Mode */
     .chatgpt-auth-card {
         background: #ffffff;
@@ -359,6 +440,12 @@ if "chats" not in st.session_state:
 
 if "selected_model" not in st.session_state:
     st.session_state.selected_model = "openai/gpt-4o-mini"
+
+if "_attached_file" not in st.session_state:
+    st.session_state._attached_file = None
+
+if "thinking_mode" not in st.session_state:
+    st.session_state.thinking_mode = False
 
 
 # -------------------------------------------------------------
@@ -589,6 +676,19 @@ def api_update_user_settings(selected_model: str, theme: str, auth_token: str) -
         return {"success": False, "error": str(e)}
 
 
+def api_upload_chat_attachment(file_bytes: bytes, filename: str, chat_id: str, user_id: str) -> dict:
+    """Upload picture, PDF, video, audio or AI/code file via POST /chats/upload."""
+    try:
+        files = {"file": (filename, file_bytes)}
+        data = {"chat_id": chat_id, "user_id": user_id}
+        resp = requests.post(f"{API_BASE_URL}/chats/upload", files=files, data=data, timeout=30.0)
+        if resp.status_code in [200, 201]:
+            return {"success": True, "data": resp.json()}
+        return {"success": False, "error": resp.text}
+    except requests.RequestException as e:
+        return {"success": False, "error": str(e)}
+
+
 # -------------------------------------------------------------
 # 5. Chat & Messaging API Functions
 # -------------------------------------------------------------
@@ -642,14 +742,23 @@ def fetch_chat_messages(chat_id: str) -> List[Dict]:
         return []
 
 
-def send_chat_message(chat_id: str, user_id: str, message: str, model_name: str) -> Optional[str]:
-    """Send user message and receive AI reply."""
+def send_chat_message(
+    chat_id: str,
+    user_id: str,
+    message: str,
+    model_name: str,
+    file_id: Optional[str] = None,
+    thinking_mode: bool = False
+) -> Optional[str]:
+    """Send user message with optional attachment and reasoning/thinking mode."""
     try:
         payload = {
             "chat_id": chat_id,
             "user_id": user_id,
             "message": message,
-            "model_name": model_name
+            "model_name": model_name,
+            "file_id": file_id,
+            "thinking_mode": thinking_mode
         }
         resp = requests.post(f"{API_BASE_URL}/chats/send", json=payload, timeout=75.0)
         if resp.status_code == 200:
@@ -1295,35 +1404,90 @@ st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 # 10. Main Chat Screen (Authentic Real-World ChatGPT Experience)
 # -------------------------------------------------------------
 
-# If conversation is fresh (no messages yet) - Centered ChatGPT Logo & Name:
+# If conversation is fresh (no messages yet) - Display "What’s on the agenda today?" & GPT-6 Showcase Card:
 if not st.session_state.messages:
-    st.markdown(f"""
-        <div style="text-align: center; margin: 10vh auto 3.5vh auto; max-width: 650px;">
-            <div style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 50%; background: #ffffff; margin-bottom: 16px; border: 1.5px solid #e5e5e5; box-shadow: 0 4px 18px rgba(0,0,0,0.06);">
-                <svg width="42" height="42" viewBox="0 0 24 24" fill="#10a37f" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1683a.071.071 0 0 1 .038.052v5.5826a4.5045 4.5045 0 0 1-4.4945 4.4947zm-9.66-4.1354a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1401-1.6564zm-1.003-9.5218a4.466 4.466 0 0 1 2.3418-1.9729v.1656l-.0048 5.5163a.776.776 0 0 0 .3927.6766l5.8428 3.3732-2.02 1.1683a.0804.0804 0 0 1-.071 0l-4.8303-2.7913a4.4944 4.4944 0 0 1-1.6512-6.1358zm16.597 3.8558-5.8428-3.3732 2.02-1.1683a.0804.0804 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6773a.79.79 0 0 0-.402-.6767zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.776.776 0 0 0-.7854 0L9.409 10.1297V7.7973a.0804.0804 0 0 1 .0332-.0615l4.8303-2.7914a4.4992 4.4992 0 0 1 6.6802 4.6545v.0001zm-12.641 4.1353-2.02-1.1635a.0804.0804 0 0 1-.038-.052v-5.5826a4.4992 4.4992 0 0 1 7.3709-3.4539l-.142.0805-4.7783 2.7582a.7948.7948 0 0 0-.3926.6813v6.732z"/>
-                </svg>
-            </div>
-            <h1 style="color: #0d0d0d; font-size: 2.15rem; font-weight: 600; margin: 0 0 8px 0; letter-spacing: -0.6px;">ChatGPT</h1>
-            <div style="color: #676767; font-size: 1.05rem;">What can I help with today?</div>
+    st.markdown("""
+        <div style="text-align: center; margin: 30px auto 25px auto; max-width: 680px;">
+            <h1 style="color: #0d0d0d; font-size: 2.25rem; font-weight: 500; margin: 0 0 10px 0; letter-spacing: -0.6px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                What’s on the agenda today?
+            </h1>
         </div>
     """, unsafe_allow_html=True)
 
-    # 4 Real ChatGPT Prompt Suggestion Cards
-    col_p1, col_p2 = st.columns(2)
-    with col_p1:
-        if st.button("💡 Brainstorm creative ideas for a new web project", key="prompt_btn_1", use_container_width=True):
-            st.session_state._injected_prompt = "Brainstorm creative ideas for a new web project"
-            st.rerun()
-        if st.button("🐍 Write a Python script to automate a daily task", key="prompt_btn_2", use_container_width=True):
-            st.session_state._injected_prompt = "Write a Python script to automate a daily task"
-            st.rerun()
-    with col_p2:
-        if st.button("🔍 Explain how neural networks learn in simple terms", key="prompt_btn_3", use_container_width=True):
-            st.session_state._injected_prompt = "Explain how neural networks learn in simple terms"
-            st.rerun()
-        if st.button("🛠️ Help me debug a complex code issue or error", key="prompt_btn_4", use_container_width=True):
-            st.session_state._injected_prompt = "Help me debug a complex code issue or error"
+    # Purple Graphic Card matching the screenshot:
+    st.markdown("""
+        <div style="max-width: 440px; margin: 0 auto; text-align: center;">
+            <div style="background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 50%, #9333ea 100%); border-radius: 20px; padding: 22px 24px 16px 24px; box-shadow: 0 10px 30px rgba(124, 58, 237, 0.28); color: white; position: relative;">
+                <!-- Top pill bar inside purple card -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.72rem; opacity: 0.9;">
+                    <div style="background: rgba(255,255,255,0.22); padding: 3px 10px; border-radius: 12px; font-weight: 600; letter-spacing: 0.2px;">
+                        1900–2025 ▾
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span style="font-size: 0.85rem;">📈</span>
+                        <span style="background: rgba(255,255,255,0.24); padding: 2px 7px; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">📊 ≡</span>
+                    </div>
+                </div>
+                <!-- Stylized Bar Chart SVG (1900 - 2025: 1, 2.5, 4.1, 6.1, 8.2) -->
+                <svg viewBox="0 0 320 135" style="width: 100%; height: auto; overflow: visible;">
+                    <!-- Grid Lines -->
+                    <line x1="0" y1="25" x2="320" y2="25" stroke="rgba(255,255,255,0.12)" stroke-dasharray="3,3"/>
+                    <line x1="0" y1="65" x2="320" y2="65" stroke="rgba(255,255,255,0.12)" stroke-dasharray="3,3"/>
+                    <line x1="0" y1="105" x2="320" y2="105" stroke="rgba(255,255,255,0.12)" stroke-dasharray="3,3"/>
+                    
+                    <!-- Bar 1: 1 -->
+                    <rect x="25" y="85" width="28" height="24" rx="3.5" fill="rgba(255,255,255,0.45)"/>
+                    <text x="39" y="78" fill="white" font-size="9.5" text-anchor="middle" font-weight="600">1</text>
+                    <text x="39" y="122" fill="rgba(255,255,255,0.65)" font-size="8.5" text-anchor="middle">1900</text>
+                    
+                    <!-- Bar 2: 2.5 -->
+                    <rect x="85" y="66" width="28" height="43" rx="3.5" fill="rgba(255,255,255,0.62)"/>
+                    <text x="99" y="59" fill="white" font-size="9.5" text-anchor="middle" font-weight="600">2.5</text>
+                    <text x="99" y="122" fill="rgba(255,255,255,0.65)" font-size="8.5" text-anchor="middle">1950</text>
+                    
+                    <!-- Bar 3: 4.1 -->
+                    <rect x="145" y="47" width="28" height="62" rx="3.5" fill="rgba(255,255,255,0.78)"/>
+                    <text x="159" y="40" fill="white" font-size="9.5" text-anchor="middle" font-weight="600">4.1</text>
+                    <text x="159" y="122" fill="rgba(255,255,255,0.65)" font-size="8.5" text-anchor="middle">1975</text>
+                    
+                    <!-- Bar 4: 6.1 -->
+                    <rect x="205" y="27" width="28" height="82" rx="3.5" fill="rgba(255,255,255,0.92)"/>
+                    <text x="219" y="20" fill="white" font-size="9.5" text-anchor="middle" font-weight="600">6.1</text>
+                    <text x="219" y="122" fill="rgba(255,255,255,0.65)" font-size="8.5" text-anchor="middle">2000</text>
+                    
+                    <!-- Bar 5: 8.2 (Tallest Hero Bar) -->
+                    <rect x="265" y="8" width="28" height="101" rx="3.5" fill="#ffffff"/>
+                    <text x="279" y="3" fill="white" font-size="10" text-anchor="middle" font-weight="700">8.2</text>
+                    <text x="279" y="122" fill="#ffffff" font-size="8.5" text-anchor="middle" font-weight="600">2025</text>
+                </svg>
+                <!-- Bottom player bar inside card -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.18); font-size: 0.72rem; opacity: 0.9;">
+                    <span style="letter-spacing: 2px;">⏮ ▶ ⏭</span>
+                    <div style="flex: 1; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; margin: 0 10px; position: relative;">
+                        <div style="position: absolute; left: 82%; top: -3.5px; width: 10px; height: 10px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.2);"></div>
+                    </div>
+                    <span>🔄</span>
+                </div>
+            </div>
+            
+            <!-- Title & Description Below Card -->
+            <div style="margin-top: 22px; margin-bottom: 12px;">
+                <h3 style="font-size: 1.35rem; font-weight: 700; color: #0d0d0d; margin: 0 0 6px 0; letter-spacing: -0.4px;">
+                    GPT-6 with Intelligent UI
+                </h3>
+                <p style="font-size: 0.95rem; color: #6b7280; margin: 0 auto; line-height: 1.45; max-width: 380px;">
+                    Get visual and interactive answers to help you take the next step
+                </p>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # Try GPT-6 Pill Button
+    col_t1, col_try_gpt, col_t2 = st.columns([1.3, 1.4, 1.3])
+    with col_try_gpt:
+        if st.button("Try GPT-6", key="btn_try_gpt6", use_container_width=True):
+            st.session_state._injected_prompt = "Explain GPT-6 with Intelligent UI and provide interactive visual insights for AI developments from 1900 to 2025."
+            st.toast("🚀 Switched to GPT-6 Intelligent UI mode!", icon="✨")
             st.rerun()
 
 else:
@@ -1334,12 +1498,90 @@ else:
         avatar_icon = user_avatar_target if role == "user" else "🤖"
         
         with st.chat_message(role, avatar=avatar_icon):
+            # If message contains an attached file, render preview
+            if msg.get("file_info"):
+                f_info = msg["file_info"]
+                ftype = f_info.get("file_type", "")
+                fname = f_info.get("filename", "File")
+                furl = f"{BACKEND_BASE_URL}{f_info.get('file_url', '')}"
+                
+                if ftype == "image":
+                    st.image(furl, caption=f"📷 {fname}", width=320)
+                elif ftype == "video":
+                    st.video(furl)
+                elif ftype == "audio":
+                    st.audio(furl)
+                else:
+                    st.markdown(f"📎 **Attached File:** [{fname}]({furl})")
+            
             st.markdown(content)
 
-# Voice Microphone Row above/alongside Chat Input (Calls Backend Voice API)
-col_chat_empty, col_voice_mic = st.columns([0.88, 0.12])
-with col_voice_mic:
-    if st.button("🎙️ Voice", key="btn_voice_input", help="Click to speak (Calls Backend Voice API)", use_container_width=True):
+# -------------------------------------------------------------
+# Input Controls Bar (Matching Screenshot: + Button, Think, Mic, Blue Wave)
+# -------------------------------------------------------------
+c_plus, c_status, c_think, c_mic, c_voice = st.columns([0.10, 0.46, 0.20, 0.11, 0.13])
+
+with c_plus:
+    # Plus button popover for uploading attachments (Photos, PDFs, Videos, AI Code/Data)
+    with st.popover("➕", help="Attach Photos, PDFs, Videos, or AI files via Backend API"):
+        st.markdown("<span class='plus-popover-tag'></span><b>📎 Attach Content to Chat</b>", unsafe_allow_html=True)
+        st.caption("Upload images, PDFs, videos, or AI code/data files handled by `POST /chats/upload`.")
+        
+        uploaded_file = st.file_uploader(
+            "Choose file to attach",
+            type=["png", "jpg", "jpeg", "webp", "pdf", "txt", "docx", "mp4", "mp3", "wav", "py", "json", "csv", "ipynb"],
+            key="chat_attachment_input"
+        )
+        if uploaded_file is not None:
+            if st.button("📤 Upload & Attach File", key="btn_confirm_upload_file", type="primary", use_container_width=True):
+                with st.spinner("Uploading to Backend API..."):
+                    f_bytes = uploaded_file.getvalue()
+                    upload_res = api_upload_chat_attachment(
+                        file_bytes=f_bytes,
+                        filename=uploaded_file.name,
+                        chat_id=st.session_state.current_chat_id or "",
+                        user_id=st.session_state.user_id
+                    )
+                if upload_res.get("success"):
+                    st.session_state._attached_file = upload_res.get("data", {})
+                    st.toast(f"✅ Attached: {uploaded_file.name}", icon="📎")
+                    st.rerun()
+                else:
+                    st.error(f"Upload failed: {upload_res.get('error')}")
+
+with c_status:
+    # Display active file chip if attached
+    if st.session_state.get("_attached_file"):
+        att = st.session_state._attached_file
+        fname = att.get("filename", "file")
+        ftype = att.get("file_type", "")
+        fsize_kb = round(att.get("size_bytes", 0) / 1024, 1)
+        st.markdown(
+            f"<div style='background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 20px; padding: 4px 12px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 6px;'>"
+            f"<span>📎 <b>{fname}</b> <span style='color: #16a34a;'>({ftype}, {fsize_kb} KB)</span></span>"
+            f"</div>",
+            unsafe_allow_html=True
+        )
+        if st.button("✕", key="btn_clear_attached_file", help="Cancel attachment"):
+            st.session_state._attached_file = None
+            st.rerun()
+
+with c_think:
+    # Think toggle button
+    is_thinking = st.session_state.get("thinking_mode", False)
+    think_label = "🧠 Think (ON)" if is_thinking else "🧠 Think"
+    think_type = "primary" if is_thinking else "secondary"
+    if st.button(think_label, key="btn_toggle_thinking", type=think_type, help="Toggle Deep Reasoning Thinking mode", use_container_width=True):
+        st.session_state.thinking_mode = not is_thinking
+        if st.session_state.thinking_mode:
+            st.toast("🧠 Think mode enabled: Deep step-by-step reasoning active!", icon="💡")
+        else:
+            st.toast("Think mode disabled.", icon="⚡")
+        st.rerun()
+
+with c_mic:
+    # Mic Dictation Button
+    if st.button("🎙️", key="btn_mic_speech", help="Voice Dictation (Backend Voice API)", use_container_width=True):
         with st.spinner("Processing voice input via Backend Speech API..."):
             dummy_wav = b"RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00D\xac\x00\x00\x88X\x01\x00\x02\x00\x10\x00data\x00\x00\x00\x00"
             voice_res = api_transcribe_voice(dummy_wav, "mic_voice.wav")
@@ -1348,9 +1590,16 @@ with col_voice_mic:
             st.toast(f"🎙️ Backend Voice Recognized: '{prompt_txt}'", icon="🎤")
             st.rerun()
 
-# Input Bar - Always active and ready at bottom!
+with c_voice:
+    # Blue Circular Advanced Voice Mode Button (matching screenshot)
+    if st.button("〰️", key="btn_advanced_voice", help="ChatGPT Advanced Voice Mode", use_container_width=True):
+        st.toast("🎙️ Advanced Voice Mode activated! Real-time bidirectional voice ready.", icon="🔵")
+
+# -------------------------------------------------------------
+# Pill Input Bar: Ask ChatGPT
+# -------------------------------------------------------------
 injected_prompt = st.session_state.pop("_injected_prompt", None)
-user_input = st.chat_input("Message ChatGPT...", disabled=not backend_online)
+user_input = st.chat_input("Ask ChatGPT", disabled=not backend_online)
 
 prompt_to_send = injected_prompt or user_input
 if prompt_to_send:
@@ -1363,20 +1612,48 @@ if prompt_to_send:
                 st.session_state.current_chat_id = new_chat_res["chat_id"]
                 st.session_state.current_chat_title = new_chat_res.get("title", "New Conversation")
 
-        st.session_state.messages.append({
+        # Capture any attached file and thinking mode for this message
+        att_file = st.session_state.get("_attached_file")
+        file_id_to_send = att_file.get("file_id") if att_file else None
+        thinking_mode_to_send = st.session_state.get("thinking_mode", False)
+
+        user_msg = {
             "role": "user",
             "content": clean_input
-        })
+        }
+        if att_file:
+            user_msg["file_info"] = att_file
+
+        st.session_state.messages.append(user_msg)
+        # Clear attached file state after sending
+        st.session_state._attached_file = None
+
         with st.chat_message("user", avatar=user_avatar_target):
+            if user_msg.get("file_info"):
+                f_info = user_msg["file_info"]
+                ftype = f_info.get("file_type", "")
+                fname = f_info.get("filename", "File")
+                furl = f"{BACKEND_BASE_URL}{f_info.get('file_url', '')}"
+                if ftype == "image":
+                    st.image(furl, caption=f"📷 {fname}", width=320)
+                elif ftype == "video":
+                    st.video(furl)
+                elif ftype == "audio":
+                    st.audio(furl)
+                else:
+                    st.markdown(f"📎 **Attached File:** [{fname}]({furl})")
             st.markdown(clean_input)
 
         with st.chat_message("assistant", avatar="🤖"):
-            with st.spinner("Thinking..."):
+            spinner_msg = "🧠 Thinking deeply..." if thinking_mode_to_send else "Thinking..."
+            with st.spinner(spinner_msg):
                 ai_reply = send_chat_message(
                     chat_id=st.session_state.current_chat_id,
                     user_id=st.session_state.user_id,
                     message=clean_input,
-                    model_name=st.session_state.selected_model
+                    model_name=st.session_state.selected_model,
+                    file_id=file_id_to_send,
+                    thinking_mode=thinking_mode_to_send
                 )
 
             if ai_reply:

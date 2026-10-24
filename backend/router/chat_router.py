@@ -1,12 +1,14 @@
+import os
 import uuid
 import io
 from datetime import datetime, timezone
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, status, UploadFile, File, Form
+from fastapi.responses import FileResponse
 from bson import ObjectId
 import speech_recognition as sr
 
-from database import get_chat_collection, get_message_collection, get_shared_chat_collection
+from database import get_chat_collection, get_message_collection, get_shared_chat_collection, get_file_collection
 from services.llm_service import llm_service
 from router.schemas import (
     CreateChatRequest,
@@ -20,10 +22,14 @@ from router.schemas import (
     SharedChatViewResponse,
     SharedChatMessageItem,
     VoiceTranscribeResponse,
-    VoiceChatResponse
+    VoiceChatResponse,
+    FileUploadResponse
 )
 
 router = APIRouter(prefix="/chats", tags=["Chats"])
+
+UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 # -------------------------------------------------------------
@@ -185,13 +191,33 @@ async def send_chat_message(payload: SendMessageRequest):
             detail="Chat session not found."
         )
 
-    # Step 1: Save the user's incoming message to the messages collection
+    # Step 1: Check for attached file context
+    file_context = ""
+    attached_meta = None
+    if payload.file_id:
+        files_coll = get_file_collection()
+        file_doc = await files_coll.find_one({"file_id": payload.file_id.strip()})
+        if file_doc:
+            attached_meta = {
+                "file_id": file_doc["file_id"],
+                "filename": file_doc["filename"],
+                "file_type": file_doc["file_type"],
+                "file_url": file_doc["file_url"]
+            }
+            file_context = f"\n\n[Attached File: {file_doc['filename']} ({file_doc['file_type']})]"
+            if file_doc.get("preview_text"):
+                file_context += f"\nFile preview:\n```\n{file_doc['preview_text']}\n```"
+
+    full_content = clean_message + file_context
+
+    # Save the user's incoming message to the messages collection
     now = datetime.now(timezone.utc)
     user_msg_doc = {
         "chat_id": clean_chat_id,
         "user_id": clean_user_id,
         "role": "user",
-        "content": clean_message,
+        "content": full_content,
+        "attached_file": attached_meta,
         "timestamp": now
     }
     await messages.insert_one(user_msg_doc)
@@ -202,11 +228,16 @@ async def send_chat_message(payload: SendMessageRequest):
     last_10_docs.reverse()
 
     # Step 3: Format messages into standard OpenAI schema and call OpenRouter
-    formatted_messages = [
-        {"role": doc["role"], "content": doc["content"]}
-        for doc in last_10_docs
-        if doc.get("role") in ["user", "assistant", "system"]
-    ]
+    formatted_messages = []
+    if payload.thinking_mode:
+        formatted_messages.append({
+            "role": "system",
+            "content": "You are in Deep Reasoning & Thinking Mode. Think carefully, analyze multiple perspectives, and give comprehensive, accurate answers."
+        })
+
+    for doc in last_10_docs:
+        if doc.get("role") in ["user", "assistant", "system"]:
+            formatted_messages.append({"role": doc["role"], "content": doc["content"]})
 
     ai_reply = await llm_service.call_openrouter(
         messages=formatted_messages,
@@ -514,4 +545,110 @@ async def send_voice_chat(
         chat_id=clean_chat_id,
         transcribed_prompt=transcribed_text,
         reply=ai_reply
+    )
+
+
+# -------------------------------------------------------------
+# 10. File Attachment & Upload API (+ Plus Button API)
+# -------------------------------------------------------------
+@router.post(
+    "/upload",
+    response_model=FileUploadResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Upload pictures, PDFs, videos, or AI/code files"
+)
+async def upload_chat_file(
+    chat_id: str = Form(...),
+    user_id: str = Form(...),
+    file: UploadFile = File(...)
+):
+    """
+    Accepts an attached file (Image, PDF, Video, Audio, Code, AI dataset),
+    persists it into backend/uploads/, records metadata in MongoDB,
+    and returns file details and preview.
+    """
+    files_coll = get_file_collection()
+    clean_chat_id = chat_id.strip()
+    clean_user_id = user_id.strip()
+
+    file_bytes = await file.read()
+    if not file_bytes:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+
+    file_id = uuid.uuid4().hex[:12]
+    orig_name = file.filename or "attachment"
+    ext = os.path.splitext(orig_name)[1].lower()
+
+    # Categorize file
+    if ext in [".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]:
+        category = "image"
+    elif ext == ".pdf":
+        category = "pdf"
+    elif ext in [".mp4", ".mov", ".webm", ".mkv"]:
+        category = "video"
+    elif ext in [".mp3", ".wav", ".m4a", ".ogg"]:
+        category = "audio"
+    elif ext in [".py", ".json", ".csv", ".txt", ".md", ".js", ".html", ".css", ".ipynb"]:
+        category = "code_document"
+    else:
+        category = "document"
+
+    # Save to disk
+    saved_filename = f"{file_id}_{orig_name}"
+    saved_path = os.path.join(UPLOAD_DIR, saved_filename)
+    with open(saved_path, "wb") as f:
+        f.write(file_bytes)
+
+    # Extract preview text
+    preview_text = None
+    if category in ["code_document", "document"] and ext in [".txt", ".py", ".json", ".csv", ".md"]:
+        try:
+            preview_text = file_bytes[:1500].decode("utf-8", errors="ignore")
+        except Exception:
+            pass
+
+    now = datetime.now(timezone.utc)
+    file_url = f"/chats/files/{file_id}"
+
+    doc = {
+        "file_id": file_id,
+        "chat_id": clean_chat_id,
+        "user_id": clean_user_id,
+        "filename": orig_name,
+        "file_type": category,
+        "content_type": file.content_type or "application/octet-stream",
+        "size_bytes": len(file_bytes),
+        "file_path": saved_path,
+        "preview_text": preview_text,
+        "created_at": now
+    }
+    await files_coll.insert_one(doc)
+
+    return FileUploadResponse(
+        file_id=file_id,
+        filename=orig_name,
+        file_type=category,
+        file_url=file_url,
+        size_bytes=len(file_bytes),
+        preview_text=preview_text
+    )
+
+
+# -------------------------------------------------------------
+# 11. Download / Stream Uploaded Attachment
+# -------------------------------------------------------------
+@router.get(
+    "/files/{file_id}",
+    summary="Download or stream uploaded chat attachment"
+)
+async def get_chat_file(file_id: str):
+    """Serve an uploaded file (picture, PDF, video, code)."""
+    files_coll = get_file_collection()
+    doc = await files_coll.find_one({"file_id": file_id.strip()})
+    if not doc or not os.path.exists(doc.get("file_path", "")):
+        raise HTTPException(status_code=404, detail="File attachment not found.")
+    return FileResponse(
+        doc["file_path"],
+        filename=doc["filename"],
+        media_type=doc.get("content_type", "application/octet-stream")
     )

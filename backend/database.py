@@ -28,3 +28,7 @@ def get_message_collection():
 # 7. Helper function to access the 'shared_chats' collection
 def get_shared_chat_collection():
     return db["shared_chats"]
+
+# 8. Helper function to access the 'files' collection
+def get_file_collection():
+    return db["files"]
