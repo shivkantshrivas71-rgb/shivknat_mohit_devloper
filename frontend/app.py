@@ -23,19 +23,21 @@ st.set_page_config(
 # Custom High-Tech Cyberpunk Dark CSS (No blinking, no dimming, instant snappy feel)
 st.markdown("""
 <style>
-    /* 1. Prevent Streamlit brightness fading/dimming during reruns */
+    /* 1. Prevent Streamlit brightness fading/dimming during reruns & Authentic ChatGPT Dark Theme */
     html, body, [data-testid="stAppViewContainer"], .stApp {
-        background-color: #070a10 !important;
-        background: radial-gradient(circle at 50% 0%, #0d1527 0%, #070a10 85%) !important;
-        color: #e2e8f0 !important;
+        background-color: #212121 !important;
+        background: #212121 !important;
+        color: #ececec !important;
         opacity: 1 !important;
         transition: none !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
     }
     
     div[data-testid="stAppViewContainer"] > section {
         opacity: 1 !important;
         filter: none !important;
         transition: none !important;
+        background-color: #212121 !important;
     }
 
     div[data-st-app-view="true"], div[data-testid="stMain"], div[data-testid="stAppViewBlockContainer"] {
@@ -43,6 +45,7 @@ st.markdown("""
         filter: none !important;
         transition: none !important;
         animation: none !important;
+        background-color: #212121 !important;
     }
 
     /* Hide the top-right blinking reload spinner indicator */
@@ -51,102 +54,64 @@ st.markdown("""
         visibility: hidden !important;
     }
 
-    /* 2. Sidebar Cyber Dark Styling */
+    /* 2. Sidebar ChatGPT Dark Styling (#171717) */
     section[data-testid="stSidebar"] {
-        background-color: #0b0f19 !important;
-        border-right: 1px solid #162032 !important;
+        background-color: #171717 !important;
+        border-right: 1px solid #2f2f2f !important;
     }
     
     section[data-testid="stSidebar"] h1, 
     section[data-testid="stSidebar"] h2, 
     section[data-testid="stSidebar"] h3 {
-        color: #00f2fe !important;
-        letter-spacing: 0.5px;
+        color: #ececec !important;
+        font-weight: 600 !important;
     }
 
-    /* 3. Tech Header Badge & Cards */
-    .tech-header-card {
-        background: linear-gradient(135deg, rgba(13, 21, 39, 0.9) 0%, rgba(9, 13, 23, 0.95) 100%);
-        border: 1px solid #1e293b;
-        border-left: 4px solid #00f2fe;
-        border-radius: 12px;
-        padding: 18px 24px;
-        margin-bottom: 20px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    }
-    
-    .tech-title {
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: #f8fafc;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 10px;
+    /* 3. Real ChatGPT Message Styling */
+    /* User Message Bubble (#2f2f2f) */
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+        background-color: #2f2f2f !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 18px !important;
+        padding: 12px 18px !important;
+        margin-bottom: 12px !important;
+        color: #ececec !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
     }
 
-    .tech-badge-cyan {
-        display: inline-block;
-        background: rgba(0, 242, 254, 0.12);
-        color: #00f2fe;
-        border: 1px solid rgba(0, 242, 254, 0.3);
-        padding: 3px 9px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-family: monospace;
-        font-weight: 600;
-        letter-spacing: 0.5px;
+    /* Assistant Reply (Clean transparent stream) */
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+        background-color: transparent !important;
+        border: none !important;
+        padding: 10px 4px !important;
+        margin-bottom: 16px !important;
+        color: #ececec !important;
     }
 
-    .tech-badge-green {
-        display: inline-block;
-        background: rgba(16, 185, 129, 0.12);
-        color: #10b981;
-        border: 1px solid rgba(16, 185, 129, 0.3);
-        padding: 3px 9px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-family: monospace;
-        font-weight: 600;
-    }
-
-    .tech-badge-red {
-        display: inline-block;
-        background: rgba(239, 68, 68, 0.12);
-        color: #ef4444;
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        padding: 3px 9px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-family: monospace;
-        font-weight: 600;
-    }
-
-    /* 4. Old Chats Text Format Container */
+    /* 4. Chat History Item in Sidebar (#171717 with subtle hover) */
     .history-card {
-        background-color: #0e1422;
-        border: 1px solid #1a2538;
+        background-color: transparent;
+        border: 1px solid transparent;
         border-radius: 8px;
-        padding: 8px 12px;
-        margin-bottom: 8px;
-        transition: all 0.15s ease-in-out;
+        padding: 8px 10px;
+        margin-bottom: 4px;
+        transition: all 0.12s ease-in-out;
     }
     
     .history-card:hover {
-        border-color: #00f2fe;
-        background-color: #121b2d;
+        background-color: #212121;
+        border-color: #2f2f2f;
     }
 
     .history-card-active {
-        background-color: #132238 !important;
-        border: 1px solid #00f2fe !important;
-        box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
+        background-color: #212121 !important;
+        border: 1px solid #383838 !important;
     }
 
     .history-title {
-        color: #e2e8f0;
+        color: #ececec;
         font-size: 0.88rem;
-        font-weight: 600;
+        font-weight: 500;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -154,99 +119,89 @@ st.markdown("""
     }
 
     .history-meta {
-        font-size: 0.74rem;
-        color: #64748b;
-        font-family: monospace;
-        margin-top: 3px;
+        font-size: 0.72rem;
+        color: #8e8ea0;
+        margin-top: 2px;
         display: flex;
         justify-content: space-between;
     }
 
-    /* 5. Chat Messages Tech Glow */
-    [data-testid="stChatMessage"] {
-        background-color: #0c121e !important;
-        border: 1px solid #182234 !important;
-        border-radius: 12px !important;
-        padding: 14px 18px !important;
-        margin-bottom: 14px !important;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
-    }
-
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
-        border-left: 3px solid #00f2fe !important;
-    }
-
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
-        border-left: 3px solid #10b981 !important;
-    }
-
-    /* Modern Buttons */
+    /* 5. Minimalist Buttons */
     .stButton > button {
-        background-color: #0e1726 !important;
-        color: #38bdf8 !important;
-        border: 1px solid #1e293b !important;
+        background-color: #212121 !important;
+        color: #ececec !important;
+        border: 1px solid #2f2f2f !important;
         border-radius: 8px !important;
-        font-weight: 600 !important;
-        transition: all 0.2s ease !important;
+        font-weight: 500 !important;
+        transition: all 0.15s ease !important;
     }
 
     .stButton > button:hover {
-        background-color: #132238 !important;
-        border-color: #00f2fe !important;
+        background-color: #2f2f2f !important;
+        border-color: #424242 !important;
         color: #ffffff !important;
-        box-shadow: 0 0 12px rgba(0, 242, 254, 0.25) !important;
-        transform: translateY(-1px) !important;
     }
 
+    /* ChatGPT Accent Button (Green #10a37f) */
     .stButton > button[kind="primary"] {
-        background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%) !important;
+        background: #10a37f !important;
         color: #ffffff !important;
         border: none !important;
-        box-shadow: 0 4px 14px rgba(0, 114, 255, 0.4) !important;
+        font-weight: 600 !important;
+        box-shadow: 0 2px 10px rgba(16, 163, 127, 0.3) !important;
     }
 
     .stButton > button[kind="primary"]:hover {
-        background: linear-gradient(135deg, #00f2fe 0%, #0099ff 100%) !important;
-        box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5) !important;
+        background: #1a7f64 !important;
+        box-shadow: 0 4px 14px rgba(16, 163, 127, 0.45) !important;
     }
 
-    /* 3-Dots Settings Popover Button */
+    /* Settings Popover */
     div[data-testid="stPopover"] > button {
-        background-color: #0f172a !important;
-        border: 1px solid #1e293b !important;
+        background-color: transparent !important;
+        border: 1px solid #2f2f2f !important;
         border-radius: 8px !important;
-        color: #94a3b8 !important;
-        font-size: 1.15rem !important;
+        color: #ececec !important;
         padding: 5px 12px !important;
-        transition: all 0.2s ease !important;
+        transition: all 0.15s ease !important;
     }
 
     div[data-testid="stPopover"] > button:hover {
-        border-color: #00f2fe !important;
-        color: #ffffff !important;
-        box-shadow: 0 0 18px rgba(0, 242, 254, 0.4) !important;
-        transform: translateY(-1px) !important;
+        background-color: #2f2f2f !important;
+        border-color: #424242 !important;
     }
 
     div[data-testid="stPopoverBody"] {
-        background-color: #0b0f19 !important;
-        border: 1px solid #1e293b !important;
-        border-radius: 12px !important;
-        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7) !important;
-        color: #e2e8f0 !important;
-        padding: 16px !important;
+        background-color: #171717 !important;
+        border: 1px solid #2f2f2f !important;
+        border-radius: 14px !important;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
+        color: #ececec !important;
+        padding: 18px !important;
     }
 
-    /* Floating input container */
+    /* 6. Floating Input Bar (ChatGPT Pill Shape) */
     .stChatFloatingInputContainer {
         bottom: 15px;
         background: transparent !important;
     }
 
+    [data-testid="stChatInput"] {
+        background-color: #2f2f2f !important;
+        border-radius: 26px !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    [data-testid="stChatInput"] textarea {
+        color: #ececec !important;
+        background: transparent !important;
+    }
+
     /* ChatGPT Auth Screen Styling */
     .chatgpt-auth-card {
-        background: #17171a;
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #171717;
+        border: 1px solid #2f2f2f;
         border-radius: 16px;
         padding: 32px 28px;
         box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
@@ -271,13 +226,26 @@ st.markdown("""
         text-align: center;
         margin: 0 0 6px 0;
         letter-spacing: -0.5px;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
     .chatgpt-auth-desc {
         color: #8e8ea0;
         font-size: 0.90rem;
         text-align: center;
         margin-bottom: 22px;
+    }
+
+    /* Quick Prompt Cards */
+    .prompt-chip {
+        background: #212121;
+        border: 1px solid #2f2f2f;
+        border-radius: 14px;
+        padding: 12px 14px;
+        margin-bottom: 8px;
+        transition: all 0.12s ease-in-out;
+    }
+    .prompt-chip:hover {
+        background: #2a2a2a;
+        border-color: rgba(255, 255, 255, 0.2);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -331,7 +299,7 @@ if "is_authenticated" not in st.session_state:
     st.session_state.is_authenticated = False
 
 if "auth_mode" not in st.session_state:
-    st.session_state.auth_mode = "login"
+    st.session_state.auth_mode = "welcome"
 
 if "auth_token" not in st.session_state:
     st.session_state.auth_token = None
@@ -652,23 +620,64 @@ if not st.session_state.is_authenticated:
     auth_col1, auth_col2, auth_col3 = st.columns([0.31, 0.38, 0.31])
 
     with auth_col2:
-        # Subtle Backend Offline Notice if needed
+        # Subtle Backend Offline Notice if needed (Clean chip, no ugly banner)
         if not backend_online:
-            st.warning(f"⚠️ **Backend Offline ({API_BASE_URL})**: Please start the FastAPI backend server (`run_backend.bat`).")
+            st.markdown(f"""
+                <div style="text-align: center; margin-bottom: 14px;">
+                    <span style="display: inline-block; background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); padding: 4px 12px; border-radius: 12px; font-size: 0.82rem;">
+                        ● Backend server is offline ({API_BASE_URL})
+                    </span>
+                </div>
+            """, unsafe_allow_html=True)
 
-        auth_mode = st.session_state.get("auth_mode", "login")
+        auth_mode = st.session_state.get("auth_mode", "welcome")
 
         # -----------------------------------------------------
-        # VIEW 1: CHATGPT LOGIN
+        # VIEW 0: CHATGPT WELCOME / GET STARTED (LANDING)
         # -----------------------------------------------------
-        if auth_mode == "login":
+        if auth_mode == "welcome":
+            st.markdown("""
+                <div style="text-align: center; margin-top: 40px; margin-bottom: 24px;">
+                    <div style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 50%; background: #10a37f; box-shadow: 0 4px 20px rgba(16, 163, 127, 0.4); font-size: 28px; color: #ffffff; margin-bottom: 16px;">
+                        ⚡
+                    </div>
+                    <h1 style="color: #ffffff; font-size: 2.0rem; font-weight: 700; margin: 0 0 8px 0; letter-spacing: -0.5px;">Welcome to ChatGPT</h1>
+                    <div style="color: #8e8ea0; font-size: 0.95rem;">Log in with your account or sign up to get started</div>
+                </div>
+            """, unsafe_allow_html=True)
+
+            col_btn1, col_btn2 = st.columns(2)
+            with col_btn1:
+                if st.button("Log in", key="btn_welcome_login", type="primary", use_container_width=True, disabled=not backend_online):
+                    st.session_state.auth_mode = "login"
+                    st.rerun()
+            with col_btn2:
+                if st.button("Sign up", key="btn_welcome_signup", use_container_width=True, disabled=not backend_online):
+                    st.session_state.auth_mode = "register"
+                    st.rerun()
+
+            st.markdown("<div style='margin-top: 18px; border-top: 1px solid #2f2f2f; padding-top: 16px;'></div>", unsafe_allow_html=True)
+            if st.button("Continue as Guest", key="btn_guest_welcome", use_container_width=True):
+                st.session_state.is_authenticated = True
+                st.session_state.user_id = "guest_user"
+                st.session_state.user_email = "guest@chatgpt.local"
+                st.session_state.user_full_name = "Guest Explorer"
+                st.session_state.user_first_name = "Guest"
+                st.session_state.user_surname = "User"
+                st.session_state.is_email_verified = True
+                st.rerun()
+
+        # -----------------------------------------------------
+        # VIEW 1: CHATGPT LOGIN (EXISTING USERS)
+        # -----------------------------------------------------
+        elif auth_mode == "login":
             st.markdown("""
                 <div style="text-align: center; margin-top: 30px; margin-bottom: 22px;">
                     <div style="display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; background: #10a37f; box-shadow: 0 4px 20px rgba(16, 163, 127, 0.4); font-size: 26px; color: #ffffff; margin-bottom: 12px;">
                         ⚡
                     </div>
                     <h1 style="color: #ffffff; font-size: 1.9rem; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.5px;">Welcome back</h1>
-                    <div style="color: #8e8ea0; font-size: 0.90rem;">Log in to continue to NEXUS AI</div>
+                    <div style="color: #8e8ea0; font-size: 0.90rem;">Enter your email and password to log in</div>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -719,15 +728,9 @@ if not st.session_state.is_authenticated:
                 st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
 
-            st.markdown("<div style='margin-top: 16px; border-top: 1px solid #232733; padding-top: 14px;'></div>", unsafe_allow_html=True)
-            if st.button("Continue as Guest", key="btn_guest_login", use_container_width=True):
-                st.session_state.is_authenticated = True
-                st.session_state.user_id = "guest_user"
-                st.session_state.user_email = "guest@nexus.ai"
-                st.session_state.user_full_name = "Guest Explorer"
-                st.session_state.user_first_name = "Guest"
-                st.session_state.user_surname = "Explorer"
-                st.session_state.is_email_verified = True
+            st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+            if st.button("← Back to home", key="btn_login_back_home", use_container_width=True):
+                st.session_state.auth_mode = "welcome"
                 st.rerun()
 
         # -----------------------------------------------------
@@ -740,7 +743,7 @@ if not st.session_state.is_authenticated:
                         ⚡
                     </div>
                     <h1 style="color: #ffffff; font-size: 1.9rem; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.5px;">Create your account</h1>
-                    <div style="color: #8e8ea0; font-size: 0.90rem;">Join NEXUS AI to get started</div>
+                    <div style="color: #8e8ea0; font-size: 0.90rem;">Enter your details to get started with ChatGPT</div>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -754,12 +757,12 @@ if not st.session_state.is_authenticated:
                 if not reg_name.strip() or not reg_email.strip() or len(reg_password) < 6:
                     st.error("Please fill all fields. Password must be at least 6 characters.")
                 else:
-                    with st.spinner("Creating account..."):
+                    with st.spinner("Creating account & generating verification OTP..."):
                         res = api_user_register(reg_name, reg_email, reg_password)
                     if res["success"]:
-                        st.success("🎉 Account created! Please verify your email with the OTP sent.")
-                        st.session_state.auth_mode = "verify"
                         st.session_state._last_registered_email = reg_email.strip()
+                        st.session_state.auth_mode = "verify"
+                        st.success("🎉 Account created! Please enter the 6-digit OTP code to verify your email.")
                         time.sleep(1.0)
                         st.rerun()
                     else:
@@ -774,8 +777,13 @@ if not st.session_state.is_authenticated:
                     st.session_state.auth_mode = "login"
                     st.rerun()
 
+            st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+            if st.button("← Back to home", key="btn_register_back_home", use_container_width=True):
+                st.session_state.auth_mode = "welcome"
+                st.rerun()
+
         # -----------------------------------------------------
-        # VIEW 3: CHATGPT VERIFY OTP
+        # VIEW 3: CHATGPT VERIFY EMAIL OTP
         # -----------------------------------------------------
         elif auth_mode == "verify":
             st.markdown("""
@@ -784,7 +792,7 @@ if not st.session_state.is_authenticated:
                         🛡️
                     </div>
                     <h1 style="color: #ffffff; font-size: 1.9rem; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.5px;">Verify your email</h1>
-                    <div style="color: #8e8ea0; font-size: 0.90rem;">Enter the 6-digit OTP code sent to your email</div>
+                    <div style="color: #8e8ea0; font-size: 0.90rem;">Enter the 6-digit verification code sent to your email</div>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -803,9 +811,9 @@ if not st.session_state.is_authenticated:
                         with st.spinner("Verifying OTP..."):
                             res = api_verify_email(ver_email, ver_otp)
                         if res["success"]:
-                            st.success("✅ Email verified! You can now log in.")
+                            st.success("✅ Email verified! Please log in with your credentials to start chatting.")
                             st.session_state.auth_mode = "login"
-                            time.sleep(1.0)
+                            time.sleep(1.2)
                             st.rerun()
                         else:
                             st.error(f"❌ {res['error']}")
@@ -818,7 +826,7 @@ if not st.session_state.is_authenticated:
                             res = api_request_verification_otp(ver_email)
                         if res["success"]:
                             otp_hint = res["data"].get("otp", "")
-                            st.info(f"OTP generated! ({otp_hint})" if otp_hint else "OTP sent!")
+                            st.info(f"OTP: {otp_hint}" if otp_hint else "New OTP sent!")
                         else:
                             st.error(f"❌ {res['error']}")
 
@@ -837,7 +845,7 @@ if not st.session_state.is_authenticated:
                         🔑
                     </div>
                     <h1 style="color: #ffffff; font-size: 1.9rem; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.5px;">Reset password</h1>
-                    <div style="color: #8e8ea0; font-size: 0.90rem;">Enter your email to receive a reset code</div>
+                    <div style="color: #8e8ea0; font-size: 0.90rem;">Enter your email to receive a password reset code</div>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -855,7 +863,7 @@ if not st.session_state.is_authenticated:
                     else:
                         st.error(f"❌ {res['error']}")
 
-            st.markdown("<div style='margin: 14px 0; border-top: 1px solid #232733;'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='margin: 14px 0; border-top: 1px solid #2f2f2f;'></div>", unsafe_allow_html=True)
             rst_otp = st.text_input("Reset code (OTP)", key="auth_rst_otp", placeholder="6-digit code")
             rst_new_pw = st.text_input("New password", type="password", key="auth_rst_new_pw", placeholder="New password (min 6 chars)")
 
@@ -886,76 +894,32 @@ if not st.session_state.is_authenticated:
 # 8. AUTHENTICATED USER INTERFACE & SIDEBAR
 # -------------------------------------------------------------
 with st.sidebar:
-    # High-Tech Brand Header
-    st.markdown("""
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-            <span style="font-size: 1.8rem;">⚡</span>
-            <div>
-                <div style="font-weight: 800; font-size: 1.15rem; color: #00f2fe; letter-spacing: 1px;">NEXUS CORE</div>
-                <div style="font-size: 0.72rem; color: #64748b; font-family: monospace;">NEURAL CHAT ENGINE v2.0</div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    # Backend Online / Offline Status Badge
-    if backend_online:
-        st.markdown(f'<div class="tech-badge-green">● SYSTEM ONLINE</div>', unsafe_allow_html=True)
-    else:
-        st.markdown(f'<div class="tech-badge-red">● BACKEND OFFLINE</div>', unsafe_allow_html=True)
-
-    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
-
-    # User Profile Snippet in Sidebar
-    user_display_name = f"{st.session_state.user_first_name} {st.session_state.user_surname}".strip() or st.session_state.user_full_name or "Explorer"
-    if avatar_base64_src:
-        avatar_markup = f'<img src="{avatar_base64_src}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #00f2fe; box-shadow: 0 0 10px rgba(0,242,254,0.3);">'
-    else:
-        avatar_markup = '<div style="width: 42px; height: 42px; border-radius: 50%; background: #131d2e; border: 1.5px solid #00f2fe; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">👨‍💻</div>'
-
-    verified_badge = '<span class="tech-badge-green" style="font-size: 0.68rem; padding: 1px 5px;">VERIFIED</span>' if st.session_state.is_email_verified else '<span class="tech-badge-red" style="font-size: 0.68rem; padding: 1px 5px;">UNVERIFIED</span>'
-
-    st.markdown(f"""
-        <div style="display: flex; align-items: center; gap: 12px; background: rgba(15, 23, 42, 0.6); padding: 10px 14px; border-radius: 10px; border: 1px solid #1e293b; margin-bottom: 8px;">
-            {avatar_markup}
-            <div style="overflow: hidden; width: 100%;">
-                <div style="font-weight: 700; font-size: 0.92rem; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{user_display_name}</div>
-                <div style="font-size: 0.70rem; color: #94a3b8; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{st.session_state.user_email}</div>
-                <div style="margin-top: 3px;">{verified_badge}</div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-
-    # Logout Button
-    if st.button("🚪 Sign Out", key="sidebar_logout_btn", use_container_width=True):
-        st.session_state.is_authenticated = False
-        st.session_state.auth_token = None
-        st.session_state.user_id = ""
-        st.session_state.user_email = ""
-        st.session_state.user_full_name = ""
+    # 1. ChatGPT + New Chat Button at top of Sidebar
+    if st.button("＋  New chat", key="sidebar_new_chat_top", use_container_width=True, disabled=not backend_online):
         st.session_state.current_chat_id = None
-        st.session_state.chats = None
+        st.session_state.current_chat_title = "New Conversation"
         st.session_state.messages = []
-        st.toast("Signed out successfully", icon="👋")
         st.rerun()
 
-    # Model Selection
-    st.markdown("<span style='font-size: 0.8rem; font-weight: 600; color: #94a3b8; font-family: monospace;'>⚡ NEURAL MODEL</span>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+
+    # Model Selector
     selected_model = st.selectbox(
-        "OpenRouter Model:",
+        "Model:",
         options=AVAILABLE_MODELS,
         index=AVAILABLE_MODELS.index(st.session_state.selected_model) if st.session_state.selected_model in AVAILABLE_MODELS else 1,
         label_visibility="collapsed"
     )
     st.session_state.selected_model = selected_model
 
-    st.divider()
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
 
-    # 📜 OLD CHATS IN CLEAN TEXT FORMAT
-    col_hist_title, col_refresh = st.columns([0.78, 0.22])
+    # 📜 Chat History
+    col_hist_title, col_refresh = st.columns([0.80, 0.20])
     with col_hist_title:
-        st.markdown("<span style='font-size: 0.82rem; font-weight: 700; color: #38bdf8; letter-spacing: 0.8px;'>📁 CHAT HISTORY (TEXT FORMAT)</span>", unsafe_allow_html=True)
+        st.markdown("<span style='font-size: 0.78rem; font-weight: 600; color: #8e8ea0; letter-spacing: 0.5px;'>RECENT CHATS</span>", unsafe_allow_html=True)
     with col_refresh:
-        if st.button("🔄", key="refresh_chats_btn", help="Reload Chat History"):
+        if st.button("🔄", key="refresh_chats_btn", help="Refresh"):
             st.session_state.chats = None
             st.rerun()
 
@@ -1007,63 +971,67 @@ with st.sidebar:
                             st.rerun()
                 st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
 
-    # Context Memory Info
+    st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
     st.divider()
-    st.markdown("""
-        <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid #1e293b; border-left: 3px solid #00f2fe; padding: 10px 12px; border-radius: 6px; font-size: 0.78rem; color: #94a3b8; font-family: monospace;">
-            🧠 <strong>NEURAL MEMORY: ACTIVE</strong><br>
-            Buffers last 10 dialog turns seamlessly.
-        </div>
-    """, unsafe_allow_html=True)
+    u_c1, u_c2 = st.columns([0.72, 0.28])
+    with u_c1:
+        st.markdown(f"<div style='font-size: 0.86rem; font-weight: 600; color: #ececec; padding-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>👤 {st.session_state.user_first_name}</div>", unsafe_allow_html=True)
+    with u_c2:
+        if st.button("Log out", key="sidebar_logout_btn", help="Sign out of account", use_container_width=True):
+            st.session_state.is_authenticated = False
+            st.session_state.auth_token = None
+            st.session_state.user_id = ""
+            st.session_state.user_email = ""
+            st.session_state.user_full_name = ""
+            st.session_state.current_chat_id = None
+            st.session_state.chats = None
+            st.session_state.messages = []
+            st.rerun()
 
 
 # -------------------------------------------------------------
 # 9. Top Navigation Bar (Header)
 # -------------------------------------------------------------
-top_col1, top_col2, top_col3 = st.columns([0.22, 0.48, 0.30])
+top_col1, top_col2, top_col3 = st.columns([0.25, 0.45, 0.30])
 
 with top_col1:
     st.markdown("""
         <div style="display: flex; align-items: center; gap: 8px; height: 42px;">
-            <span style="color: #00f2fe; font-size: 1.3rem;">⚡</span>
-            <span style="font-weight: 800; font-size: 1.05rem; letter-spacing: 0.5px; color: #f8fafc;">NEXUS // AI</span>
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #10a37f; font-size: 14px; color: #ffffff;">⚡</span>
+            <span style="font-weight: 700; font-size: 1.15rem; color: #ececec; letter-spacing: -0.3px;">ChatGPT</span>
         </div>
     """, unsafe_allow_html=True)
 
 with top_col2:
-    if st.button("⚡ + NEW CHAT", key="center_new_chat_btn", type="primary", use_container_width=True, disabled=not backend_online):
-        new_chat_res = create_new_chat(st.session_state.user_id)
-        if new_chat_res:
-            st.session_state.current_chat_id = new_chat_res["chat_id"]
-            st.session_state.current_chat_title = new_chat_res.get("title", "New Conversation")
-            st.session_state.messages = []
-            st.session_state.chats = None
-            st.rerun()
+    if st.button("＋ New chat", key="center_new_chat_btn", use_container_width=True, disabled=not backend_online):
+        st.session_state.current_chat_id = None
+        st.session_state.current_chat_title = "New Conversation"
+        st.session_state.messages = []
+        st.rerun()
 
 with top_col3:
     col_user_pill, col_menu_btn = st.columns([0.55, 0.45])
     
     with col_user_pill:
         if avatar_base64_src:
-            small_pic = f'<img src="{avatar_base64_src}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1.5px solid #00f2fe; vertical-align: middle; margin-right: 6px;">'
+            small_pic = f'<img src="{avatar_base64_src}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1.5px solid #10a37f; vertical-align: middle; margin-right: 6px;">'
         else:
-            small_pic = '<span style="font-size: 1.1rem; vertical-align: middle; margin-right: 6px;">👨‍💻</span>'
+            small_pic = '<span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #2f2f2f; font-size: 13px; margin-right: 6px;">👤</span>'
 
         st.markdown(f"""
             <div style="display: flex; align-items: center; justify-content: flex-end; height: 42px; overflow: hidden;">
                 {small_pic}
-                <span style="font-size: 0.85rem; font-weight: 700; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95px;">
+                <span style="font-size: 0.85rem; font-weight: 600; color: #ececec; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95px;">
                     {st.session_state.user_first_name}
                 </span>
             </div>
         """, unsafe_allow_html=True)
 
     with col_menu_btn:
-        with st.popover("⋮  Menu", help="Settings & User Profile", use_container_width=True):
+        with st.popover("⚙️ Settings", help="Settings & Profile", use_container_width=True):
             st.markdown("""
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-                    <span style="font-size: 1.25rem;">⚙️</span>
-                    <span style="font-weight: 800; font-size: 1.1rem; color: #00f2fe; letter-spacing: 0.5px;">SETTINGS & PROFILE</span>
+                    <span style="font-weight: 700; font-size: 1.05rem; color: #ececec;">Settings</span>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -1152,69 +1120,40 @@ st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
 
 
 # -------------------------------------------------------------
-# 10. Main Chat Screen (Hero Screen vs Active Chat)
+# 10. Main Chat Screen (Authentic Real-World ChatGPT Experience)
 # -------------------------------------------------------------
-if not st.session_state.current_chat_id:
-    # HERO SCREEN
+
+# If conversation is fresh (no messages yet):
+if not st.session_state.messages:
     st.markdown(f"""
-        <div style="text-align: center; padding: 35px 20px 20px 20px;">
-            <div style="display: inline-block; width: 70px; height: 70px; line-height: 70px; border-radius: 50%; background: radial-gradient(circle, rgba(0,242,254,0.2) 0%, rgba(0,0,0,0) 70%); border: 1px solid #00f2fe; font-size: 2.2rem; box-shadow: 0 0 25px rgba(0, 242, 254, 0.35); margin-bottom: 15px;">
-                ⚡
+        <div style="text-align: center; margin: 10vh auto 3vh auto; max-width: 650px;">
+            <div style="display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 50%; background: #2f2f2f; margin-bottom: 16px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
+                <span style="font-size: 26px; color: #10a37f;">⚡</span>
             </div>
-            <h1 style="color: #ffffff; font-weight: 800; font-size: 2.4rem; margin: 0; letter-spacing: -0.5px;">
-                NEXUS AI <span style="color: #00f2fe;">ASSISTANT</span>
-            </h1>
-            <p style="color: #94a3b8; font-size: 1.05rem; max-width: 600px; margin: 12px auto 25px auto;">
-                Welcome back, <strong style="color: #f8fafc;">{user_display_name}</strong>! Ready for next-generation AI conversations.
-            </p>
-            <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-                <span class="tech-badge-cyan">MODEL: {st.session_state.selected_model}</span>
-                <span class="tech-badge-green">STATUS: READY</span>
-                <span class="tech-badge-cyan">SESSION: {st.session_state.user_id[:8]}...</span>
-            </div>
+            <h1 style="color: #ececec; font-size: 2.1rem; font-weight: 600; margin: 0 0 8px 0; letter-spacing: -0.6px;">What can I help with?</h1>
+            <div style="color: #8e8ea0; font-size: 0.95rem;">Ask a question, write code, analyze data, or explore any idea.</div>
         </div>
     """, unsafe_allow_html=True)
 
-    center_c1, center_c2, center_c3 = st.columns([0.22, 0.56, 0.22])
-    with center_c2:
-        st.markdown("""
-            <div style="background: rgba(14, 20, 34, 0.7); border: 1px dashed #23354e; border-radius: 12px; padding: 25px 20px; text-align: center; margin-bottom: 25px;">
-                <div style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 15px;">
-                    Start fresh or pick an archived conversation from the sidebar!
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-        if st.button("🚀 INITIATE NEW CONVERSATION", key="hero_start_btn", type="primary", use_container_width=True, disabled=not backend_online):
-            new_chat_res = create_new_chat(st.session_state.user_id)
-            if new_chat_res:
-                st.session_state.current_chat_id = new_chat_res["chat_id"]
-                st.session_state.current_chat_title = new_chat_res.get("title", "New Conversation")
-                st.session_state.messages = []
-                st.session_state.chats = None
-                st.rerun()
+    # 4 Real ChatGPT Prompt Suggestion Cards
+    col_p1, col_p2 = st.columns(2)
+    with col_p1:
+        if st.button("💡 Brainstorm creative ideas for a new web project", key="prompt_btn_1", use_container_width=True):
+            st.session_state._injected_prompt = "Brainstorm creative ideas for a new web project"
+            st.rerun()
+        if st.button("🐍 Write a Python script to automate a daily task", key="prompt_btn_2", use_container_width=True):
+            st.session_state._injected_prompt = "Write a Python script to automate a daily task"
+            st.rerun()
+    with col_p2:
+        if st.button("🔍 Explain how neural networks learn in simple terms", key="prompt_btn_3", use_container_width=True):
+            st.session_state._injected_prompt = "Explain how neural networks learn in simple terms"
+            st.rerun()
+        if st.button("🛠️ Help me debug a complex code issue or error", key="prompt_btn_4", use_container_width=True):
+            st.session_state._injected_prompt = "Help me debug a complex code issue or error"
+            st.rerun()
 
 else:
     # ACTIVE CHAT SESSION VIEW
-    short_session_id = st.session_state.current_chat_id[-8:]
-
-    st.markdown(f"""
-        <div class="tech-header-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                <div>
-                    <div class="tech-title">
-                        <span>⚡</span> {st.session_state.current_chat_title}
-                    </div>
-                    <div style="font-size: 0.75rem; color: #64748b; font-family: monospace; margin-top: 5px;">
-                        SESSION: <span style="color: #00f2fe;">#{short_session_id}</span> &nbsp;|&nbsp; MODEL: <span style="color: #cbd5e1;">{st.session_state.selected_model}</span>
-                    </div>
-                </div>
-                <div>
-                    <span class="tech-badge-green">● LIVE CONTEXT</span>
-                </div>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-
     for msg in st.session_state.messages:
         role = msg.get("role", "user")
         content = msg.get("content", "")
@@ -1223,38 +1162,48 @@ else:
         with st.chat_message(role, avatar=avatar_icon):
             st.markdown(content)
 
-    user_input = st.chat_input("Ask NEXUS anything (Tech query, code, reasoning)...", disabled=not backend_online)
+# Input Bar - Always active and ready at bottom!
+injected_prompt = st.session_state.pop("_injected_prompt", None)
+user_input = st.chat_input("Message ChatGPT...", disabled=not backend_online)
 
-    if user_input:
-        clean_input = user_input.strip()
-        if clean_input:
-            st.session_state.messages.append({
-                "role": "user",
-                "content": clean_input
-            })
-            with st.chat_message("user", avatar=user_avatar_target):
-                st.markdown(clean_input)
+prompt_to_send = injected_prompt or user_input
+if prompt_to_send:
+    clean_input = prompt_to_send.strip()
+    if clean_input:
+        # If no active chat session, create one automatically
+        if not st.session_state.current_chat_id:
+            new_chat_res = create_new_chat(st.session_state.user_id)
+            if new_chat_res:
+                st.session_state.current_chat_id = new_chat_res["chat_id"]
+                st.session_state.current_chat_title = new_chat_res.get("title", "New Conversation")
 
-            with st.chat_message("assistant", avatar="⚡"):
-                with st.spinner("⚡ Neural Core processing query..."):
-                    ai_reply = send_chat_message(
-                        chat_id=st.session_state.current_chat_id,
-                        user_id=st.session_state.user_id,
-                        message=clean_input,
-                        model_name=st.session_state.selected_model
-                    )
+        st.session_state.messages.append({
+            "role": "user",
+            "content": clean_input
+        })
+        with st.chat_message("user", avatar=user_avatar_target):
+            st.markdown(clean_input)
 
-                if ai_reply:
-                    st.markdown(ai_reply)
-                    st.session_state.messages.append({
-                        "role": "assistant",
-                        "content": ai_reply
-                    })
+        with st.chat_message("assistant", avatar="⚡"):
+            with st.spinner("Thinking..."):
+                ai_reply = send_chat_message(
+                    chat_id=st.session_state.current_chat_id,
+                    user_id=st.session_state.user_id,
+                    message=clean_input,
+                    model_name=st.session_state.selected_model
+                )
 
-                    st.session_state.chats = None
-                    refreshed = fetch_user_chats(st.session_state.user_id, force_reload=True)
-                    for c in refreshed:
-                        if c["chat_id"] == st.session_state.current_chat_id:
-                            st.session_state.current_chat_title = c.get("title", st.session_state.current_chat_title)
-                            break
-                    st.rerun()
+            if ai_reply:
+                st.markdown(ai_reply)
+                st.session_state.messages.append({
+                    "role": "assistant",
+                    "content": ai_reply
+                })
+
+                st.session_state.chats = None
+                refreshed = fetch_user_chats(st.session_state.user_id, force_reload=True)
+                for c in refreshed:
+                    if c["chat_id"] == st.session_state.current_chat_id:
+                        st.session_state.current_chat_title = c.get("title", st.session_state.current_chat_title)
+                        break
+                st.rerun()
